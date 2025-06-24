@@ -1,6 +1,6 @@
 /* Main Styling */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f8f9fa;
     color: #333;
     line-height: 1.6;
@@ -16,6 +16,61 @@ header {
 header h1 {
     color: #2c3e50;
     font-weight: 600;
+}
+
+/* Chart Styling */
+.chart-container {
+    height: 500px; /* Increased height for the chart */
+    min-height: 500px;
+    position: relative;
+    margin: 20px 0;
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075);
+    border: 1px solid #dee2e6;
+}
+
+#cashFlowChart {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Tooltip styling */
+.chartjs-tooltip {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-radius: 0.25rem;
+    color: white;
+    padding: 0.5rem;
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.chartjs-tooltip table {
+    margin: 0;
+}
+
+.chartjs-tooltip table tr {
+    background: transparent !important;
+}
+
+.chartjs-tooltip table td {
+    padding: 0.25rem 0.5rem;
+    border: none;
+}
+
+.chartjs-tooltip table td:first-child {
+    padding-right: 1rem;
+}
+
+.chartjs-tooltip-key {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: 5px;
+    border-radius: 2px;
 }
 
 /* Card Styling */
@@ -77,20 +132,112 @@ header h1 {
     transform: translateY(-1px);
 }
 
-/* Table Styling */
+/* Phase indicators */
+.phase-indicator {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.phase-label {
+    position: absolute;
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    left: 5px;
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+}
+
+/* Table styles */
 .table {
     font-size: 0.9rem;
+    border-collapse: separate;
+    border-spacing: 0;
 }
 
 .table th {
-    font-weight: 600;
+    white-space: nowrap;
+    vertical-align: middle;
     background-color: #f8f9fa;
-    border-top: none;
-    border-bottom: 2px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
 }
 
 .table td {
     vertical-align: middle;
+    position: relative;
+}
+
+/* Phase separators */
+.phase-separator {
+    background-color: #f1f8ff !important;
+    border-top: 2px solid #0d6efd;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.phase-separator td {
+    padding: 0.5rem;
+    font-size: 1rem;
+    color: #0d6efd;
+}
+
+/* Phase-specific row styling */
+.phase-1 {
+    background-color: rgba(13, 110, 253, 0.03);
+}
+
+.phase-2 {
+    background-color: rgba(25, 135, 84, 0.03);
+}
+
+.phase-3 {
+    background-color: rgba(13, 202, 240, 0.03);
+}
+
+/* Year start rows */
+.year-start {
+    border-top: 2px dashed rgba(0,0,0,0.1);
+}
+
+/* Hover effects */
+tbody tr:hover {
+    background-color: rgba(0,0,0,0.02) !important;
+}
+
+/* Responsive table container */
+.table-responsive {
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+    margin-bottom: 1.5rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Scrollbar styling */
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 /* KPI Cards */

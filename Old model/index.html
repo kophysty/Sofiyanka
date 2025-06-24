@@ -11,7 +11,7 @@
     <div class="container-fluid">
         <header class="my-4">
             <h1 class="text-center">Софьинка Глэмпинг - Финансовая модель</h1>
-            <p class="text-muted text-center">Версия 1.1 | Обновлено: Июль 2024</p>
+            <p class="text-muted text-center">Версия 1.0 | Обновлено: Июнь 2025</p>
         </header>
 
         <div class="row">
@@ -22,26 +22,13 @@
                         <h5 class="mb-0">Параметры модели</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Nav tabs -->
-                        <ul class="nav nav-tabs" id="paramsTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="capex-tab" data-bs-toggle="tab" data-bs-target="#capex-panel" type="button" role="tab" aria-controls="capex-panel" aria-selected="true">Основные</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="houses-tab" data-bs-toggle="tab" data-bs-target="#houses-panel" type="button" role="tab" aria-controls="houses-panel" aria-selected="false">Жилой фонд</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="ops-tab" data-bs-toggle="tab" data-bs-target="#ops-panel" type="button" role="tab" aria-controls="ops-panel" aria-selected="false">Операционные</button>
-                            </li>
-                        </ul>
-
-                        <!-- Tab panes -->
-                        <div class="tab-content pt-3">
-                            <div class="tab-pane fade show active" id="capex-panel" role="tabpanel" aria-labelledby="capex-tab">
+                        <form id="parameters-form">
+                            <!-- CAPEX Section -->
+                            <div class="mb-4">
                                 <h6>КАПЕКС (млн ₽)</h6>
-                                <div class="form-group mb-3">
-                                    <label class="form-label fw-bold">Жилой фонд</label>
-                                    <input type="number" class="form-control" id="residential-fund-total" value="27.5" readonly>
+                                <div class="form-group mb-2">
+                                    <label class="form-label">Residential Fund (10 houses)</label>
+                                    <input type="number" class="form-control" id="residential-fund" value="27.2" step="0.1">
                                 </div>
                                 <div class="form-group mb-2">
                                     <label class="form-label">Public/Service Buildings</label>
@@ -80,36 +67,9 @@
                                     <input type="number" class="form-control fw-bold" id="total-capex" value="51.1" step="0.1" readonly>
                                 </div>
                             </div>
-                            <div class="tab-pane fade" id="houses-panel" role="tabpanel" aria-labelledby="houses-tab">
-                                <div id="house-config-section" class="mb-3">
-                                    <label class="form-label fw-bold">Конфигурация жилого фонда</label>
-                                    <div id="house-list">
-                                        <!-- House row template -->
-                                        <div class="house-row input-group mb-2">
-                                            <select class="form-select" data-type="house-type">
-                                                <option value="Comfort" selected>Comfort</option>
-                                                <option value="A-Frame">A-Frame</option>
-                                                <option value="Family">Family</option>
-                                                <option value="One-House">One-House</option>
-                                            </select>
-                                            <select class="form-select" data-type="house-tier">
-                                                <option value="economy">Эконом</option>
-                                                <option value="base" selected>База</option>
-                                                <option value="premium">Премиум</option>
-                                            </select>
-                                            <input type="number" class="form-control" data-type="house-qty" value="10" min="1" style="flex-grow: 0.5;">
-                                            <span class="input-group-text" style="width: 80px;"></span>
-                                            <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
-                                        </div>
-                                    </div>
-                                    <button class="btn btn-outline-primary btn-sm w-100 mb-3" type="button" id="add-house-btn">Добавить дом</button>
-                                    <div class="form-group">
-                                        <label class="form-label fw-bold">Итого по жилому фонду</label>
-                                        <input type="number" class="form-control" id="house-list-total" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="ops-panel" role="tabpanel" aria-labelledby="ops-tab">
+
+                            <!-- Operational Parameters -->
+                            <div class="mb-4">
                                 <h6>Операционные параметры</h6>
                                 <div class="form-group mb-2">
                                     <label class="form-label">Occupancy Rate (%)</label>
@@ -120,51 +80,13 @@
                                     <input type="number" class="form-control" id="adr" value="9400">
                                 </div>
                                 <div class="form-group mb-2">
-                                    <label class="form-label">Рост ADR (% в год)</label>
-                                    <input type="number" class="form-control" id="adr-cagr" value="3.0" step="0.1">
-                                </div>
-                                <h6>Операционные расходы (OPEX)</h6>
-                                <div class="form-group mb-2">
-                                    <label class="form-label">ФОТ (в год)</label>
-                                    <input type="number" class="form-control" id="opex-payroll" value="3500000" step="100000">
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label class="form-label">Маркетинг (в год)</label>
-                                    <input type="number" class="form-control" id="opex-marketing" value="1200000" step="100000">
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label class="form-label">Комиссия систем бронирования (% от выручки)</label>
-                                    <input type="number" class="form-control" id="opex-booking" value="5" step="1">
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label class="form-label">Расходники (на занятый юнит в сутки)</label>
-                                    <input type="number" class="form-control" id="opex-consumables" value="500" step="50">
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label class="form-label">Коммунальные платежи (в мес.)</label>
-                                    <input type="number" class="form-control" id="opex-utilities" value="250000" step="10000">
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label class="form-label">Рост OPEX (% в год)</label>
-                                    <input type="number" class="form-control" id="opex-cagr" value="6.0" step="0.1">
-                                </div>
-                                <hr>
-                                <div class="form-group mb-3">
-                                    <label for="tax-regime" class="form-label">Система налогообложения</label>
-                                    <select class="form-select" id="tax-regime">
-                                        <option value="USN6" selected>УСН 6% (доходы)</option>
-                                        <option value="USN15">УСН 15% (доходы - расходы)</option>
-                                        <option value="OSN">ОСН (налог на прибыль)</option>
-                                        <option value="NONE">Нет (самозанятость, НПД)</option>
-                                    </select>
-                                </div>
-                                <h6>Дополнительные доходы</h6>
-                                <div id="extra-revenue-section">
-                                  <!-- This section will be populated dynamically -->
+                                    <label class="form-label">OPEX (% of Revenue)</label>
+                                    <input type="number" class="form-control" id="opex-percent" value="50" min="0" max="100">
                                 </div>
                             </div>
-                        </div>
-                        <button type="button" class="btn btn-primary w-100 mt-3">Рассчитать</button>
+
+                            <button type="button" class="btn btn-primary w-100" onclick="calculate()">Рассчитать</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -227,7 +149,6 @@
                                     <th>Выручка</th>
                                     <th>ОПЕКС</th>
                                     <th>КАПЕКС</th>
-                                    <th>Налог</th>
                                     <th>Чистый денежный поток</th>
                                     <th>Накопленный CF</th>
                                 </tr>
@@ -253,7 +174,25 @@
     <!-- Load Chart.js first -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <!-- Then load our app -->
-    <!--<script src="app.js"></script>-->
-    <script type="module" src="/src/main.ts"></script>
+    <script src="app.js"></script>
+    <!-- Initialize the app after everything is loaded -->
+    <script>
+        console.log('Initializing application...');
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js failed to load!');
+        } else {
+            console.log('Chart.js loaded successfully, version:', Chart.version);
+            // Initialize the application
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('DOM fully loaded');
+                if (typeof calculate === 'function') {
+                    console.log('Running initial calculation...');
+                    calculate();
+                } else {
+                    console.error('calculate function not found!');
+                }
+            });
+        }
+    </script>
 </body>
 </html>

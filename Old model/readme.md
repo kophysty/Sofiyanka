@@ -13,9 +13,8 @@
 | **/data**      | Price lists & presets editable without code (JSON).                                                             |
 | **/scenarios** | User‑saved what‑if runs (one *Scenario JSON* each).                                                             |
 | **/styles**    | SCSS sources; Vite compiles to `/public/css`.                                                                   |
-| **/docs**      | Markdown documentation (PRDs, specs, smeta, enhancement plans).                   |
+| **/docs**      | Markdown documentation (PRDs, specs, smeta).                                                                    |
 | **README.md**  | 👉 *this file* – high‑level map & developer quick‑start.                                                        |
-| **CHANGELOG.md** | Журнал изменений проекта (лог всех ключевых доработок и фиксов). |
 
 Full tree (abridged):
 
@@ -45,13 +44,7 @@ sofyinka/
 ├─ docs/
 │  ├─ prd_file_architecture.md
 │  ├─ logic_enhancement_spec.md
-│  ├─ sofyinka_summary_prd.md
-│  ├─ financial_model_enhancement_roadmap.md
-│  ├─ phase1_plan.md
-│  ├─ implementation_summary.md
-│  ├─ Доп источники выручки.md
-│  ├─ Программа капитальных вложений 21b535c900f080fcbe8bf8a13e9e0baf.md
-│  └─ phase1_implementation_plan.md (duplicate, can be removed)
+│  └─ sofyinka_summary_prd.md
 └─ README.md
 ```
 
@@ -120,14 +113,4 @@ See `` for full backlog & acceptance tests.
 ## 6 | License
 
 MIT (to be confirmed).
-
----
-
-## 7 | Change Log
-
-Вся история изменений и доработок фиксируется в файле `CHANGELOG.md` в корне проекта. При каждом значимом изменении:
-- Кратко описывайте дату, суть и область изменений
-- Следуйте формату:
-  - `## YYYY-MM-DD`
-  - Список изменений
 

@@ -34,6 +34,9 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="ops-tab" data-bs-toggle="tab" data-bs-target="#ops-panel" type="button" role="tab" aria-controls="ops-panel" aria-selected="false">Операционные</button>
                             </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="seasonality-tab" data-bs-toggle="tab" data-bs-target="#seasonality-panel" type="button" role="tab" aria-controls="seasonality-panel" aria-selected="false">Сезонность</button>
+                            </li>
                         </ul>
 
                         <!-- Tab panes -->
@@ -87,18 +90,44 @@
                                     <div id="house-list">
                                         <!-- House row template -->
                                         <div class="house-row input-group mb-2">
-                                            <select class="form-select" data-type="house-type">
-                                                <option value="Comfort" selected>Comfort</option>
-                                                <option value="A-Frame">A-Frame</option>
-                                                <option value="Family">Family</option>
-                                                <option value="One-House">One-House</option>
-                                            </select>
-                                            <select class="form-select" data-type="house-tier">
-                                                <option value="economy">Эконом</option>
-                                                <option value="base" selected>База</option>
-                                                <option value="premium">Премиум</option>
-                                            </select>
-                                            <input type="number" class="form-control" data-type="house-qty" value="10" min="1" style="flex-grow: 0.5;">
+                                            <select class="form-select" data-type="house-type"><option value="Модульный EasyFab (27 м²)" selected>Модульный EasyFab (27 м²)</option></select>
+                                            <select class="form-select" data-type="house-tier"><option value="comfort" selected>comfort</option></select>
+                                            <input type="number" class="form-control" data-type="house-qty" value="4" min="1" style="flex-grow: 0.5;">
+                                            <span class="input-group-text" style="width: 80px;"></span>
+                                            <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
+                                        </div>
+                                        <div class="house-row input-group mb-2">
+                                            <select class="form-select" data-type="house-type"><option value="Модульный EasyFab (27 м²)" selected>Модульный EasyFab (27 м²)</option></select>
+                                            <select class="form-select" data-type="house-tier"><option value="premium_base" selected>premium_base</option></select>
+                                            <input type="number" class="form-control" data-type="house-qty" value="2" min="1" style="flex-grow: 0.5;">
+                                            <span class="input-group-text" style="width: 80px;"></span>
+                                            <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
+                                        </div>
+                                        <div class="house-row input-group mb-2">
+                                            <select class="form-select" data-type="house-type"><option value="A-Frame (39 м²)" selected>A-Frame (39 м²)</option></select>
+                                            <select class="form-select" data-type="house-tier"><option value="comfort" selected>comfort</option></select>
+                                            <input type="number" class="form-control" data-type="house-qty" value="1" min="1" style="flex-grow: 0.5;">
+                                            <span class="input-group-text" style="width: 80px;"></span>
+                                            <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
+                                        </div>
+                                        <div class="house-row input-group mb-2">
+                                            <select class="form-select" data-type="house-type"><option value="A-Frame (39 м²)" selected>A-Frame (39 м²)</option></select>
+                                            <select class="form-select" data-type="house-tier"><option value="premium_base" selected>premium_base</option></select>
+                                            <input type="number" class="form-control" data-type="house-qty" value="1" min="1" style="flex-grow: 0.5;">
+                                            <span class="input-group-text" style="width: 80px;"></span>
+                                            <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
+                                        </div>
+                                        <div class="house-row input-group mb-2">
+                                            <select class="form-select" data-type="house-type"><option value="Family-suite (44 м²)" selected>Family-suite (44 м²)</option></select>
+                                            <select class="form-select" data-type="house-tier"><option value="comfort" selected>comfort</option></select>
+                                            <input type="number" class="form-control" data-type="house-qty" value="1" min="1" style="flex-grow: 0.5;">
+                                            <span class="input-group-text" style="width: 80px;"></span>
+                                            <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
+                                        </div>
+                                        <div class="house-row input-group mb-2">
+                                            <select class="form-select" data-type="house-type"><option value="Family-suite (44 м²)" selected>Family-suite (44 м²)</option></select>
+                                            <select class="form-select" data-type="house-tier"><option value="premium_base" selected>premium_base</option></select>
+                                            <input type="number" class="form-control" data-type="house-qty" value="1" min="1" style="flex-grow: 0.5;">
                                             <span class="input-group-text" style="width: 80px;"></span>
                                             <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
                                         </div>
@@ -168,6 +197,12 @@
                                 <h6>Дополнительные доходы</h6>
                                 <div id="extra-revenue-section">
                                   <!-- This section will be populated dynamically -->
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="seasonality-panel" role="tabpanel" aria-labelledby="seasonality-tab">
+                                <h6>Коэффициенты сезонности (влияют на Occupancy)</h6>
+                                <div id="seasonality-sliders">
+                                    <!-- Sliders will be populated by JavaScript -->
                                 </div>
                             </div>
                         </div>

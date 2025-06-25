@@ -1,8 +1,9 @@
 /**
  * Scenario model - single source of truth for all parameters
  */
-import { House } from './House';
+import { House, HouseType, HouseTier } from './House';
 import { Phase } from './Phase';
+import { MonthlyFactor } from '../constants/seasonality';
 
 export type TaxRegime = 'USN6' | 'USN15' | 'OSN' | 'NONE';
 
@@ -22,6 +23,7 @@ export interface ScenarioParams {
   opexCAGR: number;
   taxRegime: TaxRegime;
   extraRevenueServices: string[]; // IDs of enabled extra revenue streams
+  seasonality: Record<string, MonthlyFactor>;
   [key: string]: any;
 }
 
@@ -35,6 +37,10 @@ export class Scenario {
   params: ScenarioParams;
   createdAt: Date;
   updatedAt: Date;
+  opexCAGR: number;
+  taxRegime: TaxRegime;
+  extraRevenueServices: string[];
+  seasonality: Record<string, MonthlyFactor>;
 
   constructor(id: string, name: string, params: Partial<ScenarioParams> = {}) {
     this.id = id;
@@ -57,8 +63,13 @@ export class Scenario {
       opexCAGR: 6.0,
       taxRegime: 'USN6',
       extraRevenueServices: [], // Default to no extra services
+      seasonality: {},
       ...params
     };
+    this.opexCAGR = this.params.opexCAGR;
+    this.taxRegime = this.params.taxRegime;
+    this.extraRevenueServices = this.params.extraRevenueServices || [];
+    this.seasonality = this.params.seasonality || {};
     this.createdAt = new Date();
     this.updatedAt = new Date();
   }
@@ -87,6 +98,10 @@ export class Scenario {
         newParams.opexStructure = { ...this.params.opexStructure, ...newParams.opexStructure };
     }
     this.params = { ...this.params, ...newParams };
+    this.opexCAGR = newParams.opexCAGR || this.opexCAGR;
+    this.taxRegime = newParams.taxRegime || this.taxRegime;
+    this.extraRevenueServices = newParams.extraRevenueServices || this.extraRevenueServices;
+    this.seasonality = newParams.seasonality || this.seasonality;
     this.updatedAt = new Date();
   }
 

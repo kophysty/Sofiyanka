@@ -1,6 +1,7 @@
 import { CalculationService } from './services/calcService';
 import { HOUSE_TYPES, getHouseTypes, getTiersForType, getHouseCost } from './constants/houseTypes';
 import { EXTRA_REVENUES } from './constants/extraRevenues';
+import { SEASONALITY_FACTORS, MONTH_NAMES, MONTH_KEYS, MonthlyFactor } from './constants/seasonality';
 import { Phase } from './models/Phase';
 import { House, HouseType, HouseTier } from './models/House';
 import { Scenario, TaxRegime } from './models/Scenario';
@@ -97,12 +98,27 @@ function initializeHouseRow(row: HTMLElement) {
     const typeSelect = row.querySelector('[data-type="house-type"]') as HTMLSelectElement;
     const tierSelect = row.querySelector('[data-type="house-tier"]') as HTMLSelectElement;
 
+    // Capture initial values from the pre-filled HTML
+    const initialType = typeSelect.value as HouseType;
+    const initialTier = tierSelect.value as HouseTier;
+
+    // Populate the dropdowns with all options
     populateHouseTypeOptions(typeSelect);
-    populateTierOptions(tierSelect, typeSelect.value as HouseType);
+    // Set the house type back to its initial value
+    typeSelect.value = initialType;
+
+    // Populate tiers based on the correct initial house type
+    populateTierOptions(tierSelect, initialType);
+    // Set the tier back to its initial value
+    tierSelect.value = initialTier;
 
     // Attach event listeners to this row's inputs
     row.querySelectorAll('select, input').forEach(el => {
         el.addEventListener('change', () => {
+            // If the house type is changed, we need to re-populate the tier options
+            if (el === typeSelect) {
+                populateTierOptions(tierSelect, typeSelect.value as HouseType);
+            }
             updateHouseRowCost(row);
             updateTotalCapexUI();
             updateTotalOpexUI();
@@ -196,6 +212,22 @@ function updateTotalOpexUI() {
     }
 }
 
+function getSeasonalityFactorsFromUI(): Record<string, MonthlyFactor> {
+    const factors: Record<string, MonthlyFactor> = {};
+    MONTH_KEYS.forEach((monthKey, index) => {
+        const occupancySlider = document.querySelector(`#seasonality-sliders [data-month-key="${monthKey}"][data-factor-type="occupancy"]`) as HTMLInputElement;
+        const adrSlider = document.querySelector(`#seasonality-sliders [data-month-key="${monthKey}"][data-factor-type="adr"]`) as HTMLInputElement;
+        
+        if (occupancySlider && adrSlider) {
+            factors[monthKey] = {
+                occupancy: parseFloat(occupancySlider.value),
+                adr: parseFloat(adrSlider.value)
+            };
+        }
+    });
+    return factors;
+}
+
 // Main calculation function
 window.calculate = function calculate() {
   // 1. Read parameters from form
@@ -244,7 +276,8 @@ window.calculate = function calculate() {
     opexStructure: params.opexStructure,
     opexCAGR: params.opexCAGR,
     taxRegime: params.taxRegime,
-    extraRevenueServices: getExtraRevenuesFromUI()
+    extraRevenueServices: getExtraRevenuesFromUI(),
+    seasonality: getSeasonalityFactorsFromUI()
   });
   scenario.addPhase(phase1);
   // HACK: Manually populate scenario.houses for legacy getTotalUnits() to work
@@ -478,6 +511,9 @@ function setupEventListeners() {
 
     // Listeners for extra revenues (triggers full recalc)
     document.getElementById('extra-revenue-section')?.addEventListener('change', window.calculate);
+    
+    // Listeners for seasonality sliders
+    document.getElementById('seasonality-sliders')?.addEventListener('input', window.calculate);
 }
 
 function populateExtraRevenues() {
@@ -514,8 +550,77 @@ function populateExtraRevenues() {
     });
 }
 
+function populateSeasonalitySliders() {
+    const container = document.getElementById('seasonality-sliders');
+    if (!container) return;
+
+    container.innerHTML = '';
+    MONTH_NAMES.forEach((name, index) => {
+        const monthKey = MONTH_KEYS[index];
+        const initialFactors = SEASONALITY_FACTORS[monthKey] || { occupancy: 1.0, adr: 1.0 };
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'mb-3 border-bottom pb-2';
+
+        const monthLabel = document.createElement('h6');
+        monthLabel.textContent = name;
+        wrapper.appendChild(monthLabel);
+        
+        // Occupancy Slider
+        const occWrapper = document.createElement('div');
+        const occLabel = document.createElement('label');
+        occLabel.className = 'form-label small';
+        occLabel.textContent = `Загрузка: `;
+        const occValueSpan = document.createElement('span');
+        occValueSpan.textContent = initialFactors.occupancy.toFixed(2);
+        occLabel.appendChild(occValueSpan);
+        
+        const occSlider = document.createElement('input');
+        occSlider.type = 'range';
+        occSlider.className = 'form-range range-slider';
+        occSlider.min = '0.5';
+        occSlider.max = '2.0';
+        occSlider.step = '0.05';
+        occSlider.value = String(initialFactors.occupancy);
+        occSlider.setAttribute('data-month-key', monthKey);
+        occSlider.setAttribute('data-factor-type', 'occupancy');
+        occSlider.addEventListener('input', () => { occValueSpan.textContent = parseFloat(occSlider.value).toFixed(2); });
+
+        occWrapper.appendChild(occLabel);
+        occWrapper.appendChild(occSlider);
+        wrapper.appendChild(occWrapper);
+
+        // ADR Slider
+        const adrWrapper = document.createElement('div');
+        const adrLabel = document.createElement('label');
+        adrLabel.className = 'form-label small';
+        adrLabel.textContent = `Цена (ADR): `;
+        const adrValueSpan = document.createElement('span');
+        adrValueSpan.textContent = initialFactors.adr.toFixed(2);
+        adrLabel.appendChild(adrValueSpan);
+
+        const adrSlider = document.createElement('input');
+        adrSlider.type = 'range';
+        adrSlider.className = 'form-range range-slider';
+        adrSlider.min = '0.8';
+        adrSlider.max = '2.5';
+        adrSlider.step = '0.05';
+        adrSlider.value = String(initialFactors.adr);
+        adrSlider.setAttribute('data-month-key', monthKey);
+        adrSlider.setAttribute('data-factor-type', 'adr');
+        adrSlider.addEventListener('input', () => { adrValueSpan.textContent = parseFloat(adrSlider.value).toFixed(2); });
+        
+        adrWrapper.appendChild(adrLabel);
+        adrWrapper.appendChild(adrSlider);
+        wrapper.appendChild(adrWrapper);
+
+        container.appendChild(wrapper);
+    });
+}
+
 function initializePage() {
     populateExtraRevenues();
+    populateSeasonalitySliders();
     setupEventListeners();
 
     // Initial setup for existing house rows

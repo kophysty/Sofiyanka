@@ -1,10 +1,10 @@
 /**
- * Seasonality adjustment factors for revenue calculation.
- * These factors adjust the base occupancy and ADR for each month.
+ * Seasonality factors for occupancy and ADR.
+ * These factors adjust the base parameters for each month.
  */
 export interface MonthlyFactor {
-  occupancy: number; // Multiplier for base occupancy rate
-  adr: number;       // Multiplier for base ADR
+    occupancy: number;
+    adr: number;
 }
 
 export const SEASONALITY_FACTORS: Record<string, MonthlyFactor> = {
@@ -22,4 +22,9 @@ export const SEASONALITY_FACTORS: Record<string, MonthlyFactor> = {
   dec: { occupancy: 1.0, adr: 1.15 }  // Pre-New Year
 };
 
-export const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']; 
+export const MONTH_KEYS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
+export const MONTH_NAMES = [
+    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+]; 

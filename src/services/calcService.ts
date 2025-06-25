@@ -119,7 +119,7 @@ export class CalculationService {
     months.forEach((monthKey, index) => {
         const monthIndex = isH2 ? index + 6 : index;
         const monthDays = daysInMonth(year, monthIndex);
-        const factor = SEASONALITY_FACTORS[monthKey];
+        const factor = scenario.seasonality[monthKey] || { occupancy: 1, adr: 1 };
 
         const adjustedOccupancy = (scenario.params.occupancy / 100) * factor.occupancy;
         let adjustedAdr = scenario.params.adr * factor.adr;

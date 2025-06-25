@@ -293,7 +293,11 @@ window.calculate = function calculate() {
   // 7. Обновить KPI в DOM
   (document.getElementById('total-investment') as HTMLElement).textContent = totalInvestment.toFixed(1);
   (document.getElementById('payback-period') as HTMLElement).textContent = kpis.paybackPeriod?.toFixed(1) ?? '-';
-  (document.getElementById('annual-revenue') as HTMLElement).textContent = cashFlow.find(cf => cf.year === 2029)?.revenue?.toFixed(1) ?? '-';
+  
+  const year5Revenue = cashFlow
+    .filter(cf => cf.year === 2029)
+    .reduce((sum, p) => sum + p.revenue, 0);
+  (document.getElementById('annual-revenue') as HTMLElement).textContent = year5Revenue.toFixed(1);
 
   // 8. Обновить таблицу
   const tbody = document.getElementById('projections-body');

@@ -358,8 +358,7 @@ window.calculate = function calculate() {
         },
         options: {
           animation: {
-            duration: 1500,
-            easing: 'easeInOutQuad'
+            duration: 1000,
           },
           responsive: true,
           maintainAspectRatio: false,

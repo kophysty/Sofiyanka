@@ -440,8 +440,13 @@ window.calculate = function calculate() {
     cashFlow.forEach((row, index) => {
       if (phaseBoundaries.includes(index)) {
         const phaseRow = document.createElement('tr');
-        phaseRow.className = 'table-primary phase-separator';
-        phaseRow.innerHTML = `<td colspan="7" class="text-center fw-bold">${phaseNames[phaseIdx]}</td>`;
+        phaseRow.className = 'phase-separator';
+        const phaseCell = document.createElement('td');
+        phaseCell.colSpan = 7;
+        const phaseName = document.createElement('span');
+        phaseName.textContent = phaseNames[phaseIdx];
+        phaseCell.appendChild(phaseName);
+        phaseRow.appendChild(phaseCell);
         tbody.appendChild(phaseRow);
         phaseIdx++;
       }

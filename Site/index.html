@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sofyanka La Camp</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#about" id="open-about-modal">О проекте</a></li>
+                <li><a href="#attractions" id="open-attractions-modal">Достопримечательности</a></li>
+                <li><a href="/index.html" target="_blank">Инвестору</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <img src="./logo_sofyinka_wite.png" alt="Sofyanka Logo" class="logo">
+        </div>
+    </section>
+
+    <section class="tagline">
+    </section>
+
+    <main>
+        <!-- Main content sections are now removed and handled by modals -->
+    </main>
+
+    <div id="about-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p class="modal-intro">Премиальный загородный комплекс в Калужской области для тех, кто ценит комфорт, приватность и нетронутую природу.</p>
+            <h3>Концепция и объём проекта</h3>
+            <ul>
+                <li><strong>Формат:</strong> глэмпинг-комплекс премиум-уровня</li>
+                <li><strong>Локация:</strong> д. Софьинка, Жуковский р-н, Калужская обл.</li>
+                <li><strong>Участок:</strong> 18 сот. + 8 сот. в аренде (парковка/техника)</li>
+                <li><strong>Фонд размещения:</strong> 10 домов
+                    <ul>
+                        <li>4 × Comfort-SIP 30 м²</li>
+                        <li>4 × A-Frame 40 м²</li>
+                        <li>1 × Family-suite 45 м²</li>
+                        <li>1 × «1-дом» (Бюро Горбунова) 49 м² — флагман, резерв под клуб/мини-отель</li>
+                    </ul>
+                </li>
+                <li><strong>Общие объекты:</strong> ресепшен 60 м², прачечная-склад 30 м², баня 28 м², бассейн 8 × 4 м, гриль-пергола, детплощадка.</li>
+            </ul>
+            <img src="IMG/project.png" alt="Проект Sofyanka" class="modal-image">
+        </div>
+    </div>
+
+    <div id="attractions-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>Достопримечательности</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Достопримечательность/Объект</th>
+                        <th>Расстояние от Софьинки</th>
+                        <th>Почему это интересно</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Этномир</td>
+                        <td>~15 км</td>
+                        <td>Крупнейший этно-парк России. Интерактивные площадки и фестивали знакомят с культурой народов мира.</td>
+                    </tr>
+                    <tr>
+                        <td>Парк птиц "Воробьи"</td>
+                        <td>~20 км</td>
+                        <td>Уникальная коллекция из 2000+ видов птиц со всего мира. Идеальное место для семейного отдыха.</td>
+                    </tr>
+                    <tr>
+                        <td>Музей Маршала Жукова</td>
+                        <td>~25 км</td>
+                        <td>Мемориальный комплекс, посвященный жизни и подвигам легендарного полководца.</td>
+                    </tr>
+                    <tr>
+                        <td>Свято-Пафнутьев Боровский монастырь</td>
+                        <td>~12 км</td>
+                        <td>Древняя обитель XV века с уникальной архитектурой. Центр духовного притяжения и паломничества.</td>
+                    </tr>
+                    <tr>
+                        <td>Усадьба Белкино</td>
+                        <td>~30 км</td>
+                        <td>Живописный усадебный парк с каскадными прудами, вдохновлявший деятелей русской культуры.</td>
+                    </tr>
+                    <tr>
+                        <td>База отдыха Головинка</td>
+                        <td>~18 км</td>
+                        <td>Популярное место для рыбалки и отдыха на воде. Чистый воздух и пейзажи на берегу реки Протвы.</td>
+                    </tr>
+                    <tr>
+                        <td>Боровск (исторический город)</td>
+                        <td>~15 км</td>
+                        <td>Один из старейших городов области, знаменитый старинной архитектурой и уличными фресками.</td>
+                    </tr>
+                    <tr>
+                        <td>Обнинск (наукоград)</td>
+                        <td>~25 км</td>
+                        <td>Первый наукоград России. Интересен своей уникальной советской архитектурой и научными музеями.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Sofyanka La Camp. Все права защищены.</p>
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+</html>

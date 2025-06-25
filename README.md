@@ -1,3 +1,5 @@
+# to start finmodel local - npx vite
+
 # Sofyinka – Financial‑Model Web App
 
 > **Purpose** – an interactive tool to size CAPEX/OPEX, play out investment phases, and benchmark KPIs (Payback, IRR) for the Sofyinka premium glamping project.
@@ -107,6 +109,6 @@ MIT (to be confirmed).
 Вся история изменений и доработок фиксируется в файле `CHANGELOG.md` в корне проекта. При каждом значимом изменении:
 - Кратко описывайте дату, суть и область изменений
 - Следуйте формату:
-  - `## YYYY-MM-DD`
+  - `## 2025-MM-DD`
   - Список изменений
 

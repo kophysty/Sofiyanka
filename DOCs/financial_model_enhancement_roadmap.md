@@ -1,27 +1,90 @@
 # Financial Model Enhancement Roadmap
 ## Sofyinka Glamping Project
 
+> **Project Timeline Note:** For the purpose of this model and its development log, the "present day" is considered to be **mid-2025**. All projections start from this year, and all changelog entries should reflect this timeline.
+
 ### Executive Summary
 
 This document outlines the systematic enhancement of the Sofyinka financial model web application, transforming it from the current basic implementation into a sophisticated, modular system that mirrors real-world investment decision-making processes.
 
 ### Current State Analysis
 
-**Existing Implementation:**
-- Single `app.js` file (693 lines) with monolithic structure
-- Basic CAPEX/OPEX calculations
-- Simple cash flow projections (2025-2033)
-- Basic KPI calculations (Payback, IRR)
-- Static phasing model
+**Initial State (Pre-Enhancement):**
+- Monolithic `app.js` structure.
+- Basic, static calculations.
 
-**Limitations:**
-- No modular architecture
-- Limited scenario management
-- No financing layer
-- No seasonality modeling
-- No tax regime flexibility
-- No extra revenue streams
-- No infrastructure granularity
+**Current State (v1.2):**
+- **Migration Complete:** The project has been successfully migrated to a modular TypeScript architecture.
+- **Enhanced Core Logic:** Implemented flexible house configuration, granular OPEX, multiple tax regimes, and seasonality factors.
+- **UI Improvements:** The interface is now tab-based, with interactive controls for seasonality and housing mix.
+- **Dynamic Calculations:** The model instantly recalculates on parameter changes.
+
+### Enhancement Features Matrix
+
+| ID | Feature | Priority | Status | Notes |
+|----|---------|----------|--------|-------|
+| L-1 | House Tier Pricing | High | **Done** | Implemented via `houseTypes.ts` and UI configuration. |
+| L-2 | Granular Infrastructure | High | **Not Started** | CAPEX for infrastructure is still a single input field. |
+| L-3 | Dynamic Phase Management | High | **Next Up** | Currently static. A detailed plan is formulated below. |
+| L-4 | Extra Revenue Streams | Medium | **Done** | Implemented with UI toggles and scaling. |
+| L-5 | Financing Layer | High | **Not Started** | No loan or investment schedule modeling yet. |
+| L-6 | Seasonality Matrix | Medium | **Done** | Seasonality factors for both Occupancy and ADR are now managed in the UI. |
+| L-7 | Cost Escalation & Inflation | Medium | **Done** | ADR and OPEX CAGR are implemented. |
+| L-8 | Tax Regimes | Medium | **Done** | Implemented via `taxService.ts` and a UI dropdown. |
+| L-9 | Payroll Breakdown | Low | **Partially Done** | Payroll is a separate input, but not broken down further. |
+| L-10| Scenario Compare | Medium | **Not Started** | Requires state management and persistence layer. |
+| L-11| Gantt of Build Works | Low | **Not Started** | A visual-only feature for post-MVP. |
+
+### Phase 1: Core Architecture Migration (Weeks 1-2) - COMPLETED
+
+#### 1.1 Project Structure Setup
+- [x] Create modular directory structure
+- [x] Set up build system (Vite)
+- [x] Configure linting and formatting
+- [x] Establish TypeScript foundation
+
+#### 1.2 Data Model Migration
+- [x] Create `src/models/` directory
+- [x] Implement `House.ts` model with tier support
+- [x] Implement `Phase.ts` model with flexible timing
+- [x] Implement `Scenario.js` as single source of truth
+- [x] Create `src/constants/` for lookup tables
+
+#### 1.3 Service Layer Foundation
+- [x] Create `src/services/calcService.js`
+- [x] Migrate calculation logic from `app.js`
+- [x] Implement immutable calculation pipeline
+- [x] Create `src/services/storageService.js`
+
+---
+
+### Future Work & Detailed Plans
+
+### L-3: Dynamic and Manageable Project Phases
+
+This is the next major planned feature.
+
+#### Current Problem
+The current implementation uses a hard-coded timeline for CAPEX distribution and unit rollout, which does not allow for flexible scenario modeling.
+
+#### Proposed Solution
+1.  **New "Phases" UI Tab:** Create a dedicated tab in the interface to manage project phases.
+2.  **Manageable Phase Parameters:** Allow the user to dynamically add, remove, and define each phase with the following parameters:
+    *   **Phase Name:** e.g., "Construction," "Launch," "Expansion."
+    *   **Start Year.**
+    *   **Duration (in years).**
+    *   **CAPEX Amount:** The capital expenditure for that specific phase.
+    *   **Units by Phase End:** The total number of units that should be operational by the end of the phase.
+3.  **Dynamic Timeline Generation:** Rework the `buildPhaseTimeline` function in `calcService.ts` to build the investment and unit rollout schedule based on the user-defined phases from the new UI.
+4.  **Dynamic Table Labels:** The phase separators in the main financial table will dynamically use the names and dates from the user's configuration.
+
+---
+
+### L-2, L-5, L-10: Other Key Future Enhancements
+
+- **Granular Infrastructure (L-2):** Break down infrastructure costs (e.g., well, electricity, sewage) into individual, toggleable items.
+- **Financing Layer (L-5):** Introduce loan modeling, including parameters like interest rate, term, grace period, and calculate debt service coverage ratio (DSCR).
+- **Scenario Management (L-10):** Implement functionality to save, load, and compare different scenarios. This will be the final step to make the tool a complete decision-making platform.
 
 ### Target Architecture Overview
 
@@ -43,43 +106,6 @@ sofyinka/
 ├─ styles/                 # SCSS sources
 └─ docs/                   # Documentation
 ```
-
-### Enhancement Features Matrix
-
-| ID | Feature | Priority | Business Value | Implementation Complexity |
-|----|---------|----------|----------------|---------------------------|
-| L-1 | House Tier Pricing | High | CAPEX accuracy | Medium |
-| L-2 | Granular Infrastructure | High | Investment flexibility | Medium |
-| L-3 | Phase Start Picker | High | Cash flow optimization | High |
-| L-4 | Extra Revenue Streams | Medium | Revenue diversification | Medium |
-| L-5 | Financing Layer | High | Real-world modeling | High |
-| L-6 | Seasonality Matrix | Medium | Cash gap analysis | Medium |
-| L-7 | Cost Escalation & Inflation | Medium | Long-term accuracy | Low |
-| L-8 | Tax Regimes | Medium | Regulatory compliance | Low |
-| L-9 | Payroll Breakdown | Low | Operational detail | Low |
-| L-10 | Scenario Compare | Medium | Decision support | Medium |
-| L-11 | Gantt of Build Works | Low | Visual planning | High |
-
-### Phase 1: Core Architecture Migration (Weeks 1-2)
-
-#### 1.1 Project Structure Setup
-- [ ] Create modular directory structure
-- [ ] Set up build system (Vite)
-- [ ] Configure linting and formatting
-- [ ] Establish TypeScript foundation
-
-#### 1.2 Data Model Migration
-- [ ] Create `src/models/` directory
-- [ ] Implement `House.js` model with tier support
-- [ ] Implement `Phase.js` model with flexible timing
-- [ ] Implement `Scenario.js` as single source of truth
-- [ ] Create `src/constants/` for lookup tables
-
-#### 1.3 Service Layer Foundation
-- [ ] Create `src/services/calcService.js`
-- [ ] Migrate calculation logic from `app.js`
-- [ ] Implement immutable calculation pipeline
-- [ ] Create `src/services/storageService.js`
 
 ### Phase 2: Enhanced Calculation Engine (Weeks 3-4)
 

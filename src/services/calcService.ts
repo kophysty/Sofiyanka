@@ -121,7 +121,9 @@ export class CalculationService {
         const monthDays = daysInMonth(year, monthIndex);
         const factor = scenario.seasonality[monthKey] || { occupancy: 1, adr: 1 };
 
-        const adjustedOccupancy = (scenario.params.occupancy / 100) * factor.occupancy;
+        const calculatedOccupancy = (scenario.params.occupancy / 100) * factor.occupancy;
+        const adjustedOccupancy = Math.min(1, calculatedOccupancy); // Cap occupancy at 100%
+        
         let adjustedAdr = scenario.params.adr * factor.adr;
 
         // Apply ADR escalation directly to the monthly ADR

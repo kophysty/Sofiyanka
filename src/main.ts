@@ -6,6 +6,7 @@ import { House, HouseType, HouseTier } from './models/House';
 import { Scenario, TaxRegime } from './models/Scenario';
 
 declare const Chart: any; // Говорим TypeScript, что Chart существует глобально
+declare const bootstrap: any; // Говорим TypeScript, что bootstrap существует глобально
 let cashFlowChart: any = null; // Переменная для хранения экземпляра графика
 
 declare global {
@@ -99,11 +100,27 @@ function initializeHouseRow(row: HTMLElement) {
     populateHouseTypeOptions(typeSelect);
     populateTierOptions(tierSelect, typeSelect.value as HouseType);
 
-    typeSelect.addEventListener('change', () => {
-        populateTierOptions(tierSelect, typeSelect.value as HouseType);
-        updateHouseRowCost(row);
-        updateTotalCapexUI();
+    // Attach event listeners to this row's inputs
+    row.querySelectorAll('select, input').forEach(el => {
+        el.addEventListener('change', () => {
+            updateHouseRowCost(row);
+            updateTotalCapexUI();
+            updateTotalOpexUI();
+        });
     });
+
+    const removeBtn = row.querySelector('[data-action="remove-house"]');
+    if(removeBtn) {
+        removeBtn.addEventListener('click', () => {
+            // Prevent removing the last row
+            if (row.parentElement?.children.length && row.parentElement.children.length > 1) {
+                row.remove();
+                updateTotalCapexUI();
+                updateTotalOpexUI();
+                window.calculate(); // Recalculate after removing a row
+            }
+        });
+    }
 }
 
 function updateTotalCapexUI() {
@@ -143,6 +160,40 @@ function updateExtraRevenueDetailsUI() {
             detailsEl.textContent = `(Выручка: ${(annualRevenue / 1_000_000).toFixed(1)} млн, Прибыль: ${(annualProfit / 1_000_000).toFixed(1)} млн)`;
         }
     });
+}
+
+function updateTotalOpexUI() {
+    const totalUnits = getHousesFromUI().reduce((sum, house) => sum + house.qty, 0);
+    const scalingFactor = totalUnits > 0 ? totalUnits / 10 : 1; // Base is 10 houses
+
+    const payroll = getInputNumber('opex-payroll', 0);
+    const marketing = getInputNumber('opex-marketing', 0);
+    const utilities = getInputNumber('opex-utilities', 0) * 12; // monthly to annual
+
+    // These are the "fixed" costs that scale with the project size
+    const baseFixedOpex = payroll + marketing + utilities;
+    const scaledFixedOpex = baseFixedOpex * scalingFactor;
+
+    // The variable part (booking, consumables) is not included here as it depends on revenue.
+    // This UI total only reflects the scalable fixed costs.
+    const totalAnnualOpex = scaledFixedOpex; 
+
+    const totalOpexInput = document.getElementById('opex-total-annual') as HTMLInputElement;
+    if (totalOpexInput) {
+        totalOpexInput.value = `${(totalAnnualOpex / 1_000_000).toFixed(2)} млн ₽`;
+    }
+
+    const tooltipIcon = document.querySelector('[data-bs-toggle="tooltip"]');
+    if (tooltipIcon) {
+        const tooltipText = `Базовые годовые затраты (ФОТ, маркетинг, комм. услуги) для 10 домов: ${(baseFixedOpex / 1_000_000).toFixed(2)} млн.
+Масштабирующий коэф-т (${totalUnits} домов / 10): ${scalingFactor.toFixed(2)}.
+Итого: ${(scaledFixedOpex / 1_000_000).toFixed(2)} млн.
+(Переменные затраты, такие как комиссия с бронирований и расходники, здесь не учтены).`;
+        const tooltip = bootstrap.Tooltip.getInstance(tooltipIcon);
+        if (tooltip) {
+            tooltip.setContent({ '.tooltip-inner': tooltipText });
+        }
+    }
 }
 
 // Main calculation function
@@ -248,163 +299,186 @@ window.calculate = function calculate() {
     const labels = cashFlow.map(row => row.period);
     
     if (cashFlowChart) {
-      cashFlowChart.destroy();
-    }
-
-    cashFlowChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Выручка',
-            data: cashFlow.map(row => row.revenue),
-            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            order: 2
+      cashFlowChart.data.labels = labels;
+      cashFlowChart.data.datasets[0].data = cashFlow.map(row => row.revenue);
+      cashFlowChart.data.datasets[1].data = cashFlow.map(row => row.opex);
+      cashFlowChart.data.datasets[2].data = cashFlow.map(row => row.capex);
+      cashFlowChart.data.datasets[3].data = cashFlow.map(row => row.netCf);
+      cashFlowChart.data.datasets[4].data = cashFlow.map(row => row.cumulativeCf);
+      cashFlowChart.update();
+    } else {
+      cashFlowChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Выручка',
+              data: cashFlow.map(row => row.revenue),
+              backgroundColor: 'rgba(75, 192, 192, 0.6)', // Teal
+              order: 2
+            },
+            {
+              label: 'OPEX',
+              data: cashFlow.map(row => row.opex),
+              backgroundColor: 'rgba(255, 159, 64, 0.6)', // Orange
+              order: 2
+            },
+            {
+              label: 'CAPEX',
+              data: cashFlow.map(row => row.capex),
+              backgroundColor: 'rgba(153, 102, 255, 0.6)', // Purple
+              order: 2
+            },
+             {
+              label: 'Чистый CF',
+              data: cashFlow.map(row => row.netCf),
+              type: 'line',
+              borderColor: 'rgba(54, 162, 235, 1)', // Blue
+              backgroundColor: 'rgba(54, 162, 235, 0.5)',
+              tension: 0.1,
+              pointRadius: 3,
+              order: 1,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Накопленный CF',
+              data: cashFlow.map(row => row.cumulativeCf),
+              type: 'line',
+              borderColor: 'rgb(255, 205, 86)', // Yellow
+              backgroundColor: 'rgba(255, 205, 86, 0.5)',
+              pointRadius: 5,
+              pointHoverRadius: 8,
+              tension: 0.1,
+              fill: false,
+              order: 1,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          animation: {
+            duration: 1500,
+            easing: 'easeInOutQuad'
           },
-          {
-            label: 'OPEX',
-            data: cashFlow.map(row => row.opex),
-            backgroundColor: 'rgba(255, 159, 64, 0.6)',
-            borderColor: 'rgba(255, 159, 64, 1)',
-            order: 2
-          },
-          {
-            label: 'CAPEX',
-            data: cashFlow.map(row => row.capex),
-            backgroundColor: 'rgba(153, 102, 255, 0.6)',
-            borderColor: 'rgba(153, 102, 255, 1)',
-            order: 2
-          },
-          {
-            type: 'line',
-            label: 'Чистый CF',
-            data: cashFlow.map(row => row.netCf),
-            borderColor: 'rgba(54, 162, 235, 1)',
-            backgroundColor: 'rgba(54, 162, 235, 0.5)',
-            yAxisID: 'y',
-            tension: 0.1,
-            order: 1
-          },
-          {
-            type: 'line',
-            label: 'Накопленный CF',
-            data: cashFlow.map(row => row.cumulativeCf),
-            borderColor: 'rgba(255, 206, 86, 1)',
-            backgroundColor: 'rgba(255, 206, 86, 0.5)',
-            yAxisID: 'y1',
-            borderDash: [5, 5],
-            tension: 0.1,
-            order: 0
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          tooltip: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
             mode: 'index',
             intersect: false,
           },
-        },
-        scales: {
-          x: {
-            stacked: false,
-          },
-          y: {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            title: {
+          scales: {
+            x: {
+              stacked: false, // Bars will be grouped
+            },
+            y: {
+              stacked: false, // Bars will be grouped
+              type: 'linear',
               display: true,
-              text: 'Денежный поток (млн ₽)'
+              position: 'left',
+              title: {
+                display: true,
+                text: 'Денежный поток (млн ₽)'
+              }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: {
+                drawOnChartArea: false, // only draw grid for y axis
+              },
+              title: {
+                display: true,
+                text: 'Накопленный CF (млн ₽)'
+              }
             }
           },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            title: {
-              display: true,
-              text: 'Накопленный CF (млн ₽)'
+          plugins: {
+            legend: {
+              onClick: (e: any, legendItem: any, legend: any) => {
+                const index = legendItem.datasetIndex;
+                const ci = legend.chart;
+                const meta = ci.getDatasetMeta(index);
+                
+                // Default behavior for toggling visibility
+                meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                
+                ci.update();
+              }
             },
-            grid: {
-              drawOnChartArea: false,
-            },
+            tooltip: {
+              callbacks: {
+                label: function(context: any) {
+                  let label = context.dataset.label || '';
+                  if (label) {
+                    label += ': ';
+                  }
+                  if (context.parsed.y !== null) {
+                    const value = context.raw as number;
+                    label += `${value.toFixed(2)} млн ₽`;
+                  }
+                  return label;
+                }
+              }
+            }
           }
         }
-      }
-    });
+      });
+    }
   }
 };
 
 function setupEventListeners() {
-    const calcButton = document.querySelector('.btn-primary');
-    if (calcButton) {
-        calcButton.addEventListener('click', window.calculate);
-    }
+    // Main calculate button
+    const calcButton = document.querySelector('.btn.btn-primary');
+    calcButton?.addEventListener('click', window.calculate);
 
-    const addHouseBtn = document.getElementById('add-house-btn');
-    if (addHouseBtn) {
-        addHouseBtn.addEventListener('click', () => {
-            const houseList = document.getElementById('house-list');
-            const templateRow = houseList?.querySelector('.house-row');
-            if (templateRow) {
-                const newHouseRow = templateRow.cloneNode(true) as HTMLElement;
-                (newHouseRow.querySelector('[data-type="house-qty"]') as HTMLInputElement).value = '1';
-                initializeHouseRow(newHouseRow);
-                houseList?.appendChild(newHouseRow);
-                updateHouseRowCost(newHouseRow);
-                updateTotalCapexUI();
-            }
-        });
-    }
+    // Add house button
+    document.getElementById('add-house-btn')?.addEventListener('click', () => {
+        const list = document.getElementById('house-list');
+        const firstRow = list?.querySelector('.house-row');
+        if (list && firstRow) {
+            const newRow = firstRow.cloneNode(true) as HTMLElement;
+            // Reset quantity for the new row
+            const qtyInput = newRow.querySelector('[data-type="house-qty"]') as HTMLInputElement;
+            if (qtyInput) qtyInput.value = '1';
 
-    // Event delegation for remove buttons and input changes
-    const houseList = document.getElementById('house-list');
-    if (houseList) {
-        houseList.addEventListener('click', (event) => {
-            const target = event.target as HTMLElement;
-            if (target && target.matches('[data-action="remove-house"]')) {
-                const houseRow = target.closest('.house-row');
-                if (houseRow && houseList.children.length > 1) {
-                    houseRow.remove();
-                    updateTotalCapexUI();
-                }
-            }
-        });
-
-        houseList.addEventListener('change', (event) => {
-            const target = event.target as HTMLElement;
-            if (target.matches('[data-type="house-tier"], [data-type="house-qty"]')) {
-                const houseRow = target.closest('.house-row') as HTMLElement;
-                if (houseRow) {
-                    updateHouseRowCost(houseRow);
-                    updateTotalCapexUI();
-                }
-            }
-        })
-    }
-
-    // Trigger recalculation on extra revenue change
-    const extraRevenueSection = document.getElementById('extra-revenue-section');
-    if (extraRevenueSection) {
-        extraRevenueSection.addEventListener('change', window.calculate);
-    }
-
-    // Trigger recalculation on any opex input change
-    const opexInputs = [
-        'opex-payroll', 'opex-marketing', 'opex-booking',
-        'opex-consumables', 'opex-utilities', 'opex-cagr'
-    ];
-    opexInputs.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.addEventListener('change', window.calculate);
+            list.appendChild(newRow);
+            initializeHouseRow(newRow); // Attach listeners to the new row
+            updateHouseRowCost(newRow);
+            updateTotalCapexUI();
+            updateTotalOpexUI();
         }
     });
+
+    // Inputs that should trigger a full recalculation
+    const fullRecalcInputs = [
+        'occupancy-rate', 'adr', 'adr-cagr', 'opex-cagr', 'tax-regime',
+        'opex-booking', 'opex-consumables'
+    ];
+    fullRecalcInputs.forEach(id => {
+        document.getElementById(id)?.addEventListener('input', window.calculate);
+    });
+
+    // Inputs that only update the CAPEX display without a full recalculation
+    const capexInputs = ['public-buildings', 'sport-spa', 'engineering', 'it-smart', 'landscaping', 'furniture', 'other'];
+    capexInputs.forEach(id => {
+        document.getElementById(id)?.addEventListener('input', updateTotalCapexUI);
+    });
+
+    // Inputs that only update the OPEX display without a full recalculation
+    const opexInputs = ['opex-payroll', 'opex-marketing', 'opex-utilities'];
+    opexInputs.forEach(id => {
+        document.getElementById(id)?.addEventListener('input', () => {
+            updateTotalOpexUI();
+            // Also trigger full recalc as it affects cash flow
+            window.calculate();
+        });
+    });
+
+    // Listeners for extra revenues (triggers full recalc)
+    document.getElementById('extra-revenue-section')?.addEventListener('change', window.calculate);
 }
 
 function populateExtraRevenues() {
@@ -441,13 +515,27 @@ function populateExtraRevenues() {
     });
 }
 
-// Автоматически запускать расчёт при загрузке
-window.addEventListener('DOMContentLoaded', () => {
-  populateExtraRevenues();
-  document.querySelectorAll('.house-row').forEach(row => {
-    initializeHouseRow(row as HTMLElement);
-  });
-  setupEventListeners();
-  updateTotalCapexUI();
-  window.calculate();
+function initializePage() {
+    populateExtraRevenues();
+    setupEventListeners();
+
+    // Initial setup for existing house rows
+    document.querySelectorAll('#house-list .house-row').forEach(row => {
+        initializeHouseRow(row as HTMLElement);
+        updateHouseRowCost(row as HTMLElement);
+    });
+
+    updateTotalCapexUI(); // Initial CAPEX calculation
+    updateTotalOpexUI(); // Initial OPEX calculation
+    window.calculate(); // Run initial calculation
+}
+
+// Ensure bootstrap tooltips are initialized
+document.addEventListener('DOMContentLoaded', () => {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+
+    initializePage();
 }); 

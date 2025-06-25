@@ -18,6 +18,25 @@
         <div class="row">
             <!-- Left Sidebar - Input Parameters -->
             <div class="col-md-4">
+                <div class="card mb-3" id="scenario-manager-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Управление сценариями (Пресетами)</h5>
+                        <div class="input-group">
+                            <select class="form-select" id="scenario-select">
+                                <option selected>Выберите сценарий...</option>
+                            </select>
+                            <button class="btn btn-outline-secondary" type="button" id="load-scenario-btn" title="Загрузить выбранный сценарий"><i class="fas fa-download"></i></button>
+                            <button class="btn btn-outline-success" type="button" id="export-scenario-btn" title="Экспорт в файл"><i class="fas fa-file-export"></i></button>
+                            <button class="btn btn-outline-danger" type="button" id="delete-scenario-btn" title="Удалить выбранный сценарий"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="d-grid gap-2 mt-2">
+                            <button class="btn btn-secondary" type="button" id="import-scenario-btn">Импорт из файла...</button>
+                            <input type="file" id="import-scenario-input" accept=".json" style="display: none;">
+                            <button class="btn btn-primary" type="button" id="save-scenario-btn">Сохранить текущий сценарий</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="card mb-4">
                     <div class="card-header bg-primary text-white">
                         <h5 class="mb-0">Параметры модели</h5>

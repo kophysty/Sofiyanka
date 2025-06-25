@@ -1,10 +1,11 @@
 import { CalculationService } from './services/calcService';
+import { StorageService } from './services/storageService';
 import { HOUSE_TYPES, getHouseTypes, getTiersForType, getHouseCost } from './constants/houseTypes';
 import { EXTRA_REVENUES } from './constants/extraRevenues';
 import { SEASONALITY_FACTORS, MONTH_NAMES, MONTH_KEYS, MonthlyFactor } from './constants/seasonality';
 import { Phase } from './models/Phase';
 import { House, HouseType, HouseTier } from './models/House';
-import { Scenario, TaxRegime } from './models/Scenario';
+import { Scenario, TaxRegime, ScenarioParams } from './models/Scenario';
 
 declare const Chart: any; // Говорим TypeScript, что Chart существует глобально
 declare const bootstrap: any; // Говорим TypeScript, что bootstrap существует глобально
@@ -30,6 +31,14 @@ function getInputString(id: string, fallback: string): string {
     return el ? el.value : fallback;
 }
 
+// Helper: set value to an input/select
+function setInputValue(id: string, value: string | number) {
+    const el = document.getElementById(id) as HTMLInputElement | HTMLSelectElement;
+    if (el) {
+        el.value = String(value);
+    }
+}
+
 // Helper: read all enabled extra revenue services from UI
 function getExtraRevenuesFromUI(): string[] {
     const services: string[] = [];
@@ -40,6 +49,14 @@ function getExtraRevenuesFromUI(): string[] {
         }
     });
     return services;
+}
+
+function setExtraRevenuesInUI(services: string[]) {
+    document.querySelectorAll('[data-extra-revenue]').forEach(el => {
+        const checkbox = el as HTMLInputElement;
+        const serviceName = checkbox.dataset.extraRevenue as string;
+        checkbox.checked = services.includes(serviceName);
+    });
 }
 
 // Helper: read all configured houses from the UI
@@ -55,6 +72,29 @@ function getHousesFromUI(): House[] {
         }
     });
     return houses;
+}
+
+function setHousesInUI(houses: House[]) {
+    const houseList = document.getElementById('house-list') as HTMLElement;
+    const addHouseBtn = document.getElementById('add-house-btn') as HTMLElement;
+    houseList.innerHTML = ''; // Clear existing rows
+
+    if (houses.length === 0) return;
+
+    houses.forEach(house => {
+        const newRow = createHouseRowElement();
+        (newRow.querySelector('[data-type="house-type"]') as HTMLSelectElement).value = house.type;
+        // Need to trigger population of tiers before setting value
+        populateTierOptions(newRow.querySelector('[data-type="house-tier"]') as HTMLSelectElement, house.type);
+        (newRow.querySelector('[data-type="house-tier"]') as HTMLSelectElement).value = house.tier;
+        (newRow.querySelector('[data-type="house-qty"]') as HTMLInputElement).value = String(house.qty);
+        
+        houseList.appendChild(newRow);
+        initializeHouseRow(newRow); // Make sure new row is interactive
+        updateHouseRowCost(newRow);
+    });
+    updateTotalCapexUI();
+    updateTotalOpexUI();
 }
 
 function updateHouseRowCost(row: HTMLElement) {
@@ -122,6 +162,7 @@ function initializeHouseRow(row: HTMLElement) {
             updateHouseRowCost(row);
             updateTotalCapexUI();
             updateTotalOpexUI();
+            window.calculate(); // Recalculate everything
         });
     });
 
@@ -226,6 +267,95 @@ function getSeasonalityFactorsFromUI(): Record<string, MonthlyFactor> {
         }
     });
     return factors;
+}
+
+function setSeasonalityFactorsInUI(factors: Record<string, MonthlyFactor>) {
+    Object.keys(factors).forEach(monthKey => {
+        const occupancySlider = document.querySelector(`#seasonality-sliders [data-month-key="${monthKey}"][data-factor-type="occupancy"]`) as HTMLInputElement;
+        const adrSlider = document.querySelector(`#seasonality-sliders [data-month-key="${monthKey}"][data-factor-type="adr"]`) as HTMLInputElement;
+
+        if (occupancySlider) occupancySlider.value = String(factors[monthKey].occupancy);
+        if (adrSlider) adrSlider.value = String(factors[monthKey].adr);
+
+        // Update slider labels
+        const occupancyLabel = document.getElementById(`occupancy-value-${monthKey}`);
+        const adrLabel = document.getElementById(`adr-value-${monthKey}`);
+        if (occupancyLabel) occupancyLabel.textContent = String(factors[monthKey].occupancy);
+        if (adrLabel) adrLabel.textContent = String(factors[monthKey].adr);
+    });
+}
+
+/**
+ * Gathers all parameters from the UI into a single object.
+ */
+function collectParamsFromUI(): ScenarioParams {
+    return {
+        // Capex
+        publicBuildings: getInputNumber('public-buildings', 0),
+        sportSpa: getInputNumber('sport-spa', 0),
+        engineering: getInputNumber('engineering', 0),
+        itSmart: getInputNumber('it-smart', 0),
+        landscaping: getInputNumber('landscaping', 0),
+        furniture: getInputNumber('furniture', 0),
+        other: getInputNumber('other', 0),
+        // Ops
+        occupancy: getInputNumber('occupancy-rate', 0),
+        adr: getInputNumber('adr', 0),
+        adrCAGR: getInputNumber('adr-cagr', 0),
+        opexStructure: {
+            payroll: getInputNumber('opex-payroll', 0),
+            marketing: getInputNumber('opex-marketing', 0),
+            booking: getInputNumber('opex-booking', 0),
+            consumables: getInputNumber('opex-consumables', 0),
+            utilities: getInputNumber('opex-utilities', 0)
+        },
+        opexCAGR: getInputNumber('opex-cagr', 0),
+        taxRegime: getInputString('tax-regime', 'USN6') as TaxRegime,
+        // Houses
+        houses: getHousesFromUI().map(h => ({ type: h.type, tier: h.tier, qty: h.qty })),
+        // Extra Revenues
+        extraRevenueServices: getExtraRevenuesFromUI(),
+        // Seasonality
+        seasonality: getSeasonalityFactorsFromUI()
+    };
+}
+
+/**
+ * Applies a scenario's parameters to the entire UI.
+ * @param params The scenario parameters object.
+ */
+function applyParamsToUI(params: ScenarioParams) {
+    // Capex
+    setInputValue('public-buildings', params.publicBuildings);
+    setInputValue('sport-spa', params.sportSpa);
+    setInputValue('engineering', params.engineering);
+    setInputValue('it-smart', params.itSmart);
+    setInputValue('landscaping', params.landscaping);
+    setInputValue('furniture', params.furniture);
+    setInputValue('other', params.other);
+    // Ops
+    setInputValue('occupancy-rate', params.occupancy);
+    setInputValue('adr', params.adr);
+    setInputValue('adr-cagr', params.adrCAGR);
+    setInputValue('opex-payroll', params.opexStructure.payroll);
+    setInputValue('opex-marketing', params.opexStructure.marketing);
+    setInputValue('opex-booking', params.opexStructure.booking);
+    setInputValue('opex-consumables', params.opexStructure.consumables);
+    setInputValue('opex-utilities', params.opexStructure.utilities);
+    setInputValue('opex-cagr', params.opexCAGR);
+    setInputValue('tax-regime', params.taxRegime);
+    // Houses
+    const houses = params.houses.map((h: { type: HouseType; tier: HouseTier; qty: number; }, i: number) => new House(`h${i}`, h.type, h.tier, h.qty));
+    setHousesInUI(houses);
+    // Extra Revenues
+    setExtraRevenuesInUI(params.extraRevenueServices);
+    // Seasonality
+    setSeasonalityFactorsInUI(params.seasonality);
+
+    // Recalculate totals and chart after loading
+    updateTotalCapexUI();
+    updateTotalOpexUI();
+    window.calculate();
 }
 
 // Main calculation function
@@ -465,6 +595,35 @@ window.calculate = function calculate() {
   }
 };
 
+function createHouseRowElement(): HTMLElement {
+    const houseRow = document.createElement('div');
+    houseRow.className = 'house-row input-group mb-2';
+    // Final assembly
+    houseRow.innerHTML = `
+        <select class="form-select" data-type="house-type"></select>
+        <select class="form-select" data-type="house-tier"></select>
+        <input type="number" class="form-control" data-type="house-qty" value="1" min="1" style="flex-grow: 0.5;">
+        <span class="input-group-text" style="width: 80px;">0.00 ₽</span>
+        <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
+    `;
+    return houseRow;
+}
+
+/**
+ * Populates the scenario dropdown with saved scenarios from StorageService.
+ */
+function updateScenarioDropdown() {
+    const select = document.getElementById('scenario-select') as HTMLSelectElement;
+    const scenarios = StorageService.listScenarios();
+    select.innerHTML = '<option selected disabled>Выберите сценарий...</option>';
+    scenarios.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+    });
+}
+
 function setupEventListeners() {
     // Main calculate button
     const calcButton = document.querySelector('.btn.btn-primary');
@@ -518,6 +677,120 @@ function setupEventListeners() {
     
     // Listeners for seasonality sliders
     document.getElementById('seasonality-sliders')?.addEventListener('input', window.calculate);
+
+    // Event listeners for scenario management
+    const saveBtn = document.getElementById('save-scenario-btn');
+    const loadBtn = document.getElementById('load-scenario-btn');
+    const deleteBtn = document.getElementById('delete-scenario-btn');
+    const scenarioSelect = document.getElementById('scenario-select') as HTMLSelectElement;
+    const exportBtn = document.getElementById('export-scenario-btn');
+    const importBtn = document.getElementById('import-scenario-btn');
+    const importInput = document.getElementById('import-scenario-input') as HTMLInputElement;
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            const name = prompt('Введите имя для сохранения сценария:');
+            if (name) {
+                try {
+                    const params = collectParamsFromUI();
+                    StorageService.saveScenario(name, params);
+                    updateScenarioDropdown();
+                    alert(`Сценарий "${name}" успешно сохранен!`);
+                    scenarioSelect.value = name;
+                } catch (e) {
+                    console.error('Failed to save scenario:', e);
+                    alert('Ошибка при сохранении сценария. См. консоль для деталей.');
+                }
+            }
+        });
+    }
+
+    if (loadBtn) {
+        loadBtn.addEventListener('click', () => {
+            const name = scenarioSelect.value;
+            if (name && scenarioSelect.selectedIndex > 0) { // Ensure it's not the placeholder
+                const params = StorageService.loadScenario(name);
+                if (params) {
+                    applyParamsToUI(params);
+                    alert(`Сценарий "${name}" загружен.`);
+                } else {
+                    alert('Не удалось загрузить сценарий.');
+                }
+            } else {
+                alert('Пожалуйста, выберите сценарий для загрузки.');
+            }
+        });
+    }
+
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            const name = scenarioSelect.value;
+            if (name && scenarioSelect.selectedIndex > 0) {
+                const params = StorageService.loadScenario(name);
+                if (params) {
+                    StorageService.exportScenarioToFile(name, params);
+                } else {
+                    alert('Не удалось найти данные для экспорта.');
+                }
+            } else {
+                alert('Пожалуйста, выберите сценарий для экспорта.');
+            }
+        });
+    }
+
+    if (importBtn && importInput) {
+        importBtn.addEventListener('click', () => {
+            importInput.click(); // Open file dialog
+        });
+
+        importInput.addEventListener('change', async () => {
+            if (importInput.files && importInput.files.length > 0) {
+                const file = importInput.files[0];
+                try {
+                    const { name, params } = await StorageService.importScenarioFromFile(file);
+                    
+                    // Check if a scenario with this name already exists
+                    const existingScenarios = StorageService.listScenarios();
+                    let scenarioName = name;
+                    if (existingScenarios.includes(name)) {
+                        if (!confirm(`Сценарий с именем "${name}" уже существует. Перезаписать его?`)) {
+                            // Reset file input to allow re-selection of the same file
+                            importInput.value = '';
+                            return;
+                        }
+                    }
+                    
+                    StorageService.saveScenario(scenarioName, params);
+                    updateScenarioDropdown();
+                    scenarioSelect.value = scenarioName; // Select the newly imported scenario
+                    applyParamsToUI(params); // Load the new scenario into the UI
+                    alert(`Сценарий "${scenarioName}" успешно импортирован и загружен!`);
+
+                } catch (error) {
+                    console.error('Import failed:', error);
+                    alert('Ошибка при импорте файла. Убедитесь, что это корректный файл сценария. Детали в консоли.');
+                } finally {
+                    // Reset file input to allow re-selection of the same file if needed
+                    importInput.value = '';
+                }
+            }
+        });
+    }
+
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+            const name = scenarioSelect.value;
+            if (name && scenarioSelect.selectedIndex > 0) {
+                if (confirm(`Вы уверены, что хотите удалить сценарий "${name}"?`)) {
+                    StorageService.deleteScenario(name);
+                    updateScenarioDropdown();
+                    alert(`Сценарий "${name}" удален.`);
+                }
+            } else {
+                alert('Пожалуйста, выберите сценарий для удаления.');
+            }
+        });
+    }
 }
 
 function populateExtraRevenues() {
@@ -623,19 +896,23 @@ function populateSeasonalitySliders() {
 }
 
 function initializePage() {
-    populateExtraRevenues();
-    populateSeasonalitySliders();
-    setupEventListeners();
-
-    // Initial setup for existing house rows
-    document.querySelectorAll('#house-list .house-row').forEach(row => {
-        initializeHouseRow(row as HTMLElement);
-        updateHouseRowCost(row as HTMLElement);
+    // Enable tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    updateTotalCapexUI(); // Initial CAPEX calculation
-    updateTotalOpexUI(); // Initial OPEX calculation
-    window.calculate(); // Run initial calculation
+    // Initial calculation and chart drawing
+    populateExtraRevenues();
+    populateSeasonalitySliders();
+    document.querySelectorAll('#house-list .house-row').forEach(row => initializeHouseRow(row as HTMLElement));
+    updateTotalCapexUI();
+    updateTotalOpexUI();
+    setupEventListeners();
+    updateScenarioDropdown(); // Populate scenarios on load
+
+    // Run calculation once on load
+    window.calculate();
 }
 
 // Ensure bootstrap tooltips are initialized

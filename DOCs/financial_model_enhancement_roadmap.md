@@ -32,7 +32,7 @@ This document outlines the systematic enhancement of the Sofyinka financial mode
 | L-7 | Cost Escalation & Inflation | Medium | **Done** | ADR and OPEX CAGR are implemented. |
 | L-8 | Tax Regimes | Medium | **Done** | Implemented via `taxService.ts` and a UI dropdown. |
 | L-9 | Payroll Breakdown | Low | **Partially Done** | Payroll is a separate input, but not broken down further. |
-| L-10| Scenario Compare | Medium | **Not Started** | Requires state management and persistence layer. |
+| L-10| Scenario Compare | Medium | **Done** | Requires state management and persistence layer. |
 | L-11| Gantt of Build Works | Low | **Not Started** | A visual-only feature for post-MVP. |
 
 ### Phase 1: Core Architecture Migration (Weeks 1-2) - COMPLETED

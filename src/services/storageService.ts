@@ -1,150 +1,107 @@
 /**
- * Storage service for scenario persistence
+ * Service for persisting and retrieving scenario data from localStorage.
  */
-import { Scenario, ScenarioParams } from '../models/Scenario';
-import { House } from '../models/House';
-import { Phase } from '../models/Phase';
+import { ScenarioParams } from '../models/Scenario';
+
+const SCENARIO_LIST_KEY = 'sofyinka_scenario_list';
+const SCENARIO_PREFIX = 'sofyinka_scenario_';
 
 export class StorageService {
-  static STORAGE_KEY = 'sofyinka_scenarios';
-  static CURRENT_SCENARIO_KEY = 'sofyinka_current_scenario';
-  static SCHEMA_VERSION = '1.0';
-
-  /**
-   * Save a scenario to storage
-   */
-  static saveScenario(scenario: Scenario): boolean {
-    try {
-      const scenarioData = {
-        ...scenario,
-        schemaVersion: this.SCHEMA_VERSION,
-        savedAt: new Date().toISOString()
-      };
-      const scenarios = this.getAllScenarios();
-      const existingIndex = scenarios.findIndex(s => s.id === scenario.id);
-      if (existingIndex >= 0) {
-        scenarios[existingIndex] = scenarioData;
-      } else {
-        scenarios.push(scenarioData);
-      }
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(scenarios));
-      localStorage.setItem(this.CURRENT_SCENARIO_KEY, scenario.id);
-      return true;
-    } catch (error) {
-      console.error('Error saving scenario:', error);
-      return false;
+    /**
+     * Get the list of all saved scenario names.
+     */
+    static listScenarios(): string[] {
+        const listJson = localStorage.getItem(SCENARIO_LIST_KEY);
+        return listJson ? JSON.parse(listJson) : [];
     }
-  }
 
-  /**
-   * Load a scenario from storage
-   */
-  static loadScenario(scenarioId: string): Scenario | null {
-    try {
-      const scenarios = this.getAllScenarios();
-      const scenarioData = scenarios.find(s => s.id === scenarioId);
-      if (!scenarioData) return null;
-      const migratedData = this.migrateScenario(scenarioData);
-      const scenario = new Scenario(migratedData.id, migratedData.name, migratedData.params);
-      scenario.houses = (migratedData.houses || []).map((h: any) => new House(h.id, h.type, h.tier, h.qty));
-      scenario.phases = (migratedData.phases || []).map((p: any) => new Phase(p.id, p.name, p.startDate, (p.houses || []).map((h: any) => new House(h.id, h.type, h.tier, h.qty)), p.capex));
-      scenario.extras = migratedData.extras || [];
-      scenario.financing = migratedData.financing || null;
-      scenario.createdAt = new Date(migratedData.createdAt);
-      scenario.updatedAt = new Date(migratedData.updatedAt);
-      return scenario;
-    } catch (error) {
-      console.error('Error loading scenario:', error);
-      return null;
+    /**
+     * Save a scenario to localStorage.
+     * @param name - The name of the scenario to save.
+     * @param data - The scenario data object.
+     */
+    static saveScenario(name: string, data: ScenarioParams): void {
+        if (!name) {
+            throw new Error('Scenario name cannot be empty.');
+        }
+        localStorage.setItem(`${SCENARIO_PREFIX}${name}`, JSON.stringify(data));
+        
+        const scenarios = this.listScenarios();
+        if (!scenarios.includes(name)) {
+            scenarios.push(name);
+            localStorage.setItem(SCENARIO_LIST_KEY, JSON.stringify(scenarios));
+        }
     }
-  }
 
-  /**
-   * Get all saved scenarios
-   */
-  static getAllScenarios(): any[] {
-    try {
-      const data = localStorage.getItem(this.STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.error('Error loading scenarios:', error);
-      return [];
+    /**
+     * Load a scenario from localStorage.
+     * @param name - The name of the scenario to load.
+     * @returns The scenario data object, or null if not found.
+     */
+    static loadScenario(name: string): ScenarioParams | null {
+        const dataJson = localStorage.getItem(`${SCENARIO_PREFIX}${name}`);
+        return dataJson ? JSON.parse(dataJson) : null;
     }
-  }
 
-  /**
-   * Get current scenario ID
-   */
-  static getCurrentScenarioId(): string | null {
-    return localStorage.getItem(this.CURRENT_SCENARIO_KEY);
-  }
-
-  /**
-   * Delete a scenario
-   */
-  static deleteScenario(scenarioId: string): boolean {
-    try {
-      const scenarios = this.getAllScenarios();
-      const filteredScenarios = scenarios.filter(s => s.id !== scenarioId);
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredScenarios));
-      if (this.getCurrentScenarioId() === scenarioId) {
-        localStorage.removeItem(this.CURRENT_SCENARIO_KEY);
-      }
-      return true;
-    } catch (error) {
-      console.error('Error deleting scenario:', error);
-      return false;
+    /**
+     * Delete a scenario from localStorage.
+     * @param name - The name of the scenario to delete.
+     */
+    static deleteScenario(name: string): void {
+        localStorage.removeItem(`${SCENARIO_PREFIX}${name}`);
+        
+        let scenarios = this.listScenarios();
+        scenarios = scenarios.filter(s => s !== name);
+        localStorage.setItem(SCENARIO_LIST_KEY, JSON.stringify(scenarios));
     }
-  }
 
-  /**
-   * Migrate scenario data if schema version is different
-   */
-  static migrateScenario(scenarioData: any): any {
-    const currentVersion = this.SCHEMA_VERSION;
-    const scenarioVersion = scenarioData.schemaVersion || '0.0';
-    if (scenarioVersion === currentVersion) {
-      return scenarioData;
+    /**
+     * Triggers the download of a scenario as a JSON file.
+     * @param name The name for the file (and the scenario).
+     * @param data The scenario data.
+     */
+    static exportScenarioToFile(name: string, data: ScenarioParams): void {
+        const dataStr = JSON.stringify({ name, ...data }, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${name}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     }
-    // Add migration logic here as schema evolves
-    console.log(`Migrating scenario from ${scenarioVersion} to ${currentVersion}`);
-    return scenarioData;
-  }
 
-  /**
-   * Export scenario to JSON file
-   */
-  static exportScenario(scenario: Scenario, filename?: string) {
-    try {
-      const dataStr = JSON.stringify(scenario, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(dataBlob);
-      link.download = filename || `${scenario.name}.json`;
-      link.click();
-      URL.revokeObjectURL(link.href);
-    } catch (error) {
-      console.error('Error exporting scenario:', error);
-    }
-  }
+    /**
+     * Reads a file from an input element and returns scenario data.
+     * @param file The file to import.
+     * @returns A promise that resolves with the scenario name and parameters.
+     */
+    static async importScenarioFromFile(file: File): Promise<{ name: string; params: ScenarioParams }> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const text = event.target?.result;
+                    if (typeof text !== 'string') {
+                        throw new Error('File content is not a string.');
+                    }
+                    const data = JSON.parse(text);
+                    const { name, ...params } = data;
 
-  /**
-   * Import scenario from JSON file
-   */
-  static async importScenario(file: File): Promise<Scenario> {
-    try {
-      const text = await file.text();
-      const scenarioData = JSON.parse(text);
-      const migratedData = this.migrateScenario(scenarioData);
-      const scenario = new Scenario(migratedData.id, migratedData.name, migratedData.params);
-      scenario.houses = (migratedData.houses || []).map((h: any) => new House(h.id, h.type, h.tier, h.qty));
-      scenario.phases = (migratedData.phases || []).map((p: any) => new Phase(p.id, p.name, p.startDate, (p.houses || []).map((h: any) => new House(h.id, h.type, h.tier, h.qty)), p.capex));
-      scenario.extras = migratedData.extras || [];
-      scenario.financing = migratedData.financing || null;
-      return scenario;
-    } catch (error) {
-      console.error('Error importing scenario:', error);
-      throw new Error('Invalid scenario file');
+                    // Basic validation
+                    if (!name || typeof name !== 'string' || !params.houses) {
+                        throw new Error('Invalid or corrupted scenario file.');
+                    }
+                    
+                    resolve({ name, params });
+                } catch (e) {
+                    reject(e);
+                }
+            };
+            reader.onerror = (error) => reject(error);
+            reader.readAsText(file);
+        });
     }
-  }
-} 
+}

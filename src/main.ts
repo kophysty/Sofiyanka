@@ -107,7 +107,7 @@ function updateHouseRowCost(row: HTMLElement) {
 
     const costEl = row.querySelector('.input-group-text') as HTMLElement;
     if (costEl) {
-        costEl.textContent = `${totalCost.toFixed(2)} ₽`;
+        costEl.textContent = `${(totalCost).toFixed(2)} млн ₽`;
     }
 }
 
@@ -178,6 +178,7 @@ function initializeHouseRow(row: HTMLElement) {
             }
         });
     }
+    updateHouseRowCost(row);
 }
 
 function updateTotalCapexUI() {
@@ -601,17 +602,16 @@ window.calculate = function calculate() {
 };
 
 function createHouseRowElement(): HTMLElement {
-    const houseRow = document.createElement('div');
-    houseRow.className = 'house-row input-group mb-2';
-    // Final assembly
-    houseRow.innerHTML = `
+    const div = document.createElement('div');
+    div.className = 'house-row input-group mb-2';
+    div.innerHTML = `
         <select class="form-select" data-type="house-type"></select>
         <select class="form-select" data-type="house-tier"></select>
-        <input type="number" class="form-control" data-type="house-qty" value="1" min="1" style="flex-grow: 0.5;">
-        <span class="input-group-text" style="width: 80px;">0.00 ₽</span>
+        <input type="number" class="form-control text-center" data-type="house-qty" value="1" min="1" style="width: 70px !important; flex: none !important;">
+        <span class="input-group-text" style="width: 160px !important; justify-content: center;">0.00 млн ₽</span>
         <button class="btn btn-outline-danger" type="button" data-action="remove-house">X</button>
     `;
-    return houseRow;
+    return div;
 }
 
 /**

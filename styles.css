@@ -242,12 +242,12 @@ tbody tr:hover {
 }
 
 .table-responsive::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: #a1a1a1;
 }
 
 /* KPI Cards */
 .card .card-title {
-    font-size: 1.75rem;
+    font-size: 2.2rem;
     font-weight: 600;
     margin: 0.5rem 0;
     color: #2c3e50;
@@ -388,4 +388,14 @@ tbody tr:hover {
 
 .col-md-8 > .row.mb-4 .card {
     background-color: #e6f2ea;
+}
+
+.sticky-kpi-bar {
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #f8f9fa; /* Or your desired background color */
+    padding: 1rem 0;
+    margin-bottom: 1rem;
 }

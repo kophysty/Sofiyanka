@@ -83,14 +83,26 @@ function setHousesInUI(houses: House[]) {
 
     houses.forEach(house => {
         const newRow = createHouseRowElement();
-        (newRow.querySelector('[data-type="house-type"]') as HTMLSelectElement).value = house.type;
-        // Need to trigger population of tiers before setting value
-        populateTierOptions(newRow.querySelector('[data-type="house-tier"]') as HTMLSelectElement, house.type);
-        (newRow.querySelector('[data-type="house-tier"]') as HTMLSelectElement).value = house.tier;
+        const typeSelect = newRow.querySelector('[data-type="house-type"]') as HTMLSelectElement;
+        const tierSelect = newRow.querySelector('[data-type="house-tier"]') as HTMLSelectElement;
+
+        // Correct order of operations:
+        // 1. Populate house types
+        populateHouseTypeOptions(typeSelect);
+        // 2. Set the type value
+        typeSelect.value = house.type;
+        // 3. Populate tiers based on the now-set type
+        populateTierOptions(tierSelect, house.type);
+        // 4. Set the tier value
+        tierSelect.value = house.tier;
+
+        // Set the quantity
         (newRow.querySelector('[data-type="house-qty"]') as HTMLInputElement).value = String(house.qty);
         
         houseList.appendChild(newRow);
-        initializeHouseRow(newRow); // Make sure new row is interactive
+        // We only need to attach event listeners now, not re-populate.
+        // We also don't need to read initial values because we just set them.
+        attachEventListenersToHouseRow(newRow);
         updateHouseRowCost(newRow);
     });
     updateTotalCapexUI();
@@ -134,6 +146,39 @@ function populateTierOptions(select: HTMLSelectElement, houseType: HouseType) {
   });
 }
 
+/**
+ * Attaches event listeners to a house row's inputs.
+ * Separated from initializeHouseRow to be used when creating rows from code.
+ */
+function attachEventListenersToHouseRow(row: HTMLElement) {
+    const typeSelect = row.querySelector('[data-type="house-type"]') as HTMLSelectElement;
+    const tierSelect = row.querySelector('[data-type="house-tier"]') as HTMLSelectElement;
+
+    row.querySelectorAll('select, input').forEach(el => {
+        el.addEventListener('change', () => {
+            if (el === typeSelect) {
+                populateTierOptions(tierSelect, typeSelect.value as HouseType);
+            }
+            updateHouseRowCost(row);
+            updateTotalCapexUI();
+            updateTotalOpexUI();
+            window.calculate();
+        });
+    });
+
+    const removeBtn = row.querySelector('[data-action="remove-house"]');
+    if(removeBtn) {
+        removeBtn.addEventListener('click', () => {
+            if (row.parentElement?.children.length && row.parentElement.children.length > 1) {
+                row.remove();
+                updateTotalCapexUI();
+                updateTotalOpexUI();
+                window.calculate();
+            }
+        });
+    }
+}
+
 function initializeHouseRow(row: HTMLElement) {
     const typeSelect = row.querySelector('[data-type="house-type"]') as HTMLSelectElement;
     const tierSelect = row.querySelector('[data-type="house-tier"]') as HTMLSelectElement;
@@ -153,31 +198,9 @@ function initializeHouseRow(row: HTMLElement) {
     tierSelect.value = initialTier;
 
     // Attach event listeners to this row's inputs
-    row.querySelectorAll('select, input').forEach(el => {
-        el.addEventListener('change', () => {
-            // If the house type is changed, we need to re-populate the tier options
-            if (el === typeSelect) {
-                populateTierOptions(tierSelect, typeSelect.value as HouseType);
-            }
-            updateHouseRowCost(row);
-            updateTotalCapexUI();
-            updateTotalOpexUI();
-            window.calculate(); // Recalculate everything
-        });
-    });
+    attachEventListenersToHouseRow(row);
 
-    const removeBtn = row.querySelector('[data-action="remove-house"]');
-    if(removeBtn) {
-        removeBtn.addEventListener('click', () => {
-            // Prevent removing the last row
-            if (row.parentElement?.children.length && row.parentElement.children.length > 1) {
-                row.remove();
-                updateTotalCapexUI();
-                updateTotalOpexUI();
-                window.calculate(); // Recalculate after removing a row
-            }
-        });
-    }
+    // Update cost based on initial values
     updateHouseRowCost(row);
 }
 
@@ -798,6 +821,25 @@ function setupEventListeners() {
     }
 }
 
+async function loadDefaultScenario() {
+    try {
+        const response = await fetch('/FinScenarios/Base1_normal.json');
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const params = await response.json();
+        // The JSON file might have a slightly different structure (e.g. name property)
+        // We only need the params part for the UI
+        const scenarioParams: ScenarioParams = params;
+        
+        applyParamsToUI(scenarioParams);
+
+    } catch (error) {
+        console.error("Could not load or apply the default scenario:", error);
+        // If loading default fails, the page will just use its hardcoded values.
+    }
+}
+
 function populateExtraRevenues() {
     const section = document.getElementById('extra-revenue-section');
     if (!section) return;
@@ -900,7 +942,7 @@ function populateSeasonalitySliders() {
     });
 }
 
-function initializePage() {
+async function initializePage() {
     // Enable tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -911,6 +953,11 @@ function initializePage() {
     populateExtraRevenues();
     populateSeasonalitySliders();
     document.querySelectorAll('#house-list .house-row').forEach(row => initializeHouseRow(row as HTMLElement));
+    
+    // Load default values from JSON instead of relying on HTML
+    await loadDefaultScenario();
+
+    // The rest of the setup relies on the UI being populated
     updateTotalCapexUI();
     updateTotalOpexUI();
     setupEventListeners();
@@ -922,10 +969,6 @@ function initializePage() {
 
 // Ensure bootstrap tooltips are initialized
 document.addEventListener('DOMContentLoaded', () => {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-
+    // The initializePage function is now async
     initializePage();
 }); 

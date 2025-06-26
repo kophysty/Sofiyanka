@@ -1,0 +1,102 @@
+{
+  "name": "Base1_normal",
+  "publicBuildings": 5.35,
+  "sportSpa": 3,
+  "engineering": 4.95,
+  "itSmart": 0.9,
+  "landscaping": 4,
+  "furniture": 1.2,
+  "other": 0.5,
+  "occupancy": 55,
+  "adr": 12000,
+  "adrCAGR": 3,
+  "opexStructure": {
+    "payroll": 2500000,
+    "marketing": 1200000,
+    "booking": 5,
+    "consumables": 500,
+    "utilities": 250000
+  },
+  "opexCAGR": 6,
+  "taxRegime": "USN6",
+  "houses": [
+    {
+      "type": "Модульный EasyFab (27 м²)",
+      "tier": "comfort",
+      "qty": 3
+    },
+    {
+      "type": "Модульный EasyFab (27 м²)",
+      "tier": "premium_base",
+      "qty": 2
+    },
+    {
+      "type": "A-Frame (39 м²)",
+      "tier": "comfort",
+      "qty": 1
+    },
+    {
+      "type": "A-Frame (39 м²)",
+      "tier": "premium_base",
+      "qty": 1
+    },
+    {
+      "type": "Family-suite (44 м²)",
+      "tier": "comfort",
+      "qty": 1
+    }
+  ],
+  "extraRevenueServices": [
+    "pool"
+  ],
+  "seasonality": {
+    "jan": {
+      "occupancy": 0.7,
+      "adr": 1.2
+    },
+    "feb": {
+      "occupancy": 0.75,
+      "adr": 1.1
+    },
+    "mar": {
+      "occupancy": 0.8,
+      "adr": 1
+    },
+    "apr": {
+      "occupancy": 0.9,
+      "adr": 1
+    },
+    "may": {
+      "occupancy": 1.1,
+      "adr": 1.2
+    },
+    "jun": {
+      "occupancy": 1.2,
+      "adr": 1.3
+    },
+    "jul": {
+      "occupancy": 1.4,
+      "adr": 1.4
+    },
+    "aug": {
+      "occupancy": 1.3,
+      "adr": 1.4
+    },
+    "sep": {
+      "occupancy": 1.1,
+      "adr": 1.1
+    },
+    "oct": {
+      "occupancy": 0.9,
+      "adr": 0.9
+    },
+    "nov": {
+      "occupancy": 0.7,
+      "adr": 0.8
+    },
+    "dec": {
+      "occupancy": 1,
+      "adr": 1.15
+    }
+  }
+}

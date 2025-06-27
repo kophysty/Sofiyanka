@@ -6,6 +6,7 @@ import { SEASONALITY_FACTORS, MONTH_NAMES, MONTH_KEYS, MonthlyFactor } from './c
 import { Phase } from './models/Phase';
 import { House, HouseType, HouseTier } from './models/House';
 import { Scenario, TaxRegime, ScenarioParams } from './models/Scenario';
+import defaultScenarioParams from '../FinScenarios/Base1_normal.json';
 
 declare const Chart: any; // Говорим TypeScript, что Chart существует глобально
 declare const bootstrap: any; // Говорим TypeScript, что bootstrap существует глобально
@@ -821,22 +822,13 @@ function setupEventListeners() {
     }
 }
 
-async function loadDefaultScenario() {
+function loadDefaultScenario() {
     try {
-        const response = await fetch('/FinScenarios/Base1_normal.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const params = await response.json();
-        // The JSON file might have a slightly different structure (e.g. name property)
-        // We only need the params part for the UI
-        const scenarioParams: ScenarioParams = params;
-        
-        applyParamsToUI(scenarioParams);
-
+        // The scenario is now directly imported, not fetched.
+        applyParamsToUI(defaultScenarioParams as ScenarioParams);
     } catch (error) {
-        console.error("Could not load or apply the default scenario:", error);
-        // If loading default fails, the page will just use its hardcoded values.
+        console.error("Could not apply the default scenario:", error);
+        // Fallback to hardcoded values in HTML if something goes wrong.
     }
 }
 
@@ -954,8 +946,8 @@ async function initializePage() {
     populateSeasonalitySliders();
     document.querySelectorAll('#house-list .house-row').forEach(row => initializeHouseRow(row as HTMLElement));
     
-    // Load default values from JSON instead of relying on HTML
-    await loadDefaultScenario();
+    // Load default values from the imported JSON
+    loadDefaultScenario();
 
     // The rest of the setup relies on the UI being populated
     updateTotalCapexUI();
@@ -969,6 +961,6 @@ async function initializePage() {
 
 // Ensure bootstrap tooltips are initialized
 document.addEventListener('DOMContentLoaded', () => {
-    // The initializePage function is now async
+    // The initializePage function is now async, but we can call it directly.
     initializePage();
 }); 

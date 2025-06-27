@@ -348,29 +348,29 @@ tbody tr:hover {
 }
 
 .sidebar-gold .btn-outline-primary:hover, .sidebar-gold .btn-outline-primary:focus {
-    background: #a8cbb7;
-    color: #fff;
+    background-color: #d4e9e2;
+    border-color: #a8cbb7;
+    color: #2e4637;
 }
 
 .sidebar-gold .form-label, .sidebar-gold .input-group-text {
-    color: #2e4637;
-    background: #f6fbf8;
-    border-color: #c7e3d7;
+    color: #495057;
+    font-weight: 500;
 }
 
 .sidebar-gold .form-control, .sidebar-gold select, .sidebar-gold textarea {
-    color: #2e4637;
-    background: #fff !important;
-    border-color: #c7e3d7;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    color: #212529;
 }
 
 .sidebar-gold .form-control:focus {
     border-color: #a8cbb7;
-    box-shadow: 0 0 0 0.2rem rgba(168, 203, 183, 0.10);
+    box-shadow: 0 0 0 0.2rem rgba(168, 203, 183, 0.25);
 }
 
 .sofyinka-logo {
-    max-width: 150px;
+    width: 150px;
     height: auto;
     filter: none !important;
     box-shadow: none;
@@ -398,4 +398,129 @@ tbody tr:hover {
     background-color: #f8f9fa; /* Or your desired background color */
     padding: 1rem 0;
     margin-bottom: 1rem;
+}
+
+/* Make top-level tabs more prominent */
+#mainTab .nav-link {
+    color: #495057;
+    font-weight: 500;
+}
+
+#mainTab .nav-link.active {
+    background-color: #2e4637 !important;
+    color: #fff !important;
+    border-bottom: none;
+}
+
+/* Styles for documentation section */
+.documentation-section {
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+
+.documentation-section h4 {
+    color: #2e4637;
+    border-bottom: 2px solid #d4e9e2;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.documentation-section ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.documentation-section li {
+    margin-bottom: 0.75rem;
+    line-height: 1.5;
+}
+
+.documentation-section strong {
+    color: #333;
+}
+
+.documentation-section table {
+    font-size: inherit;
+}
+
+.documentation-section table th {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.documentation-section sub {
+    display: block;
+    text-align: left;
+    font-style: italic;
+    color: #6c757d;
+    margin-top: 0.5rem;
+    padding-left: 0.25rem;
+}
+
+#docsTab .nav-item {
+    display: inline-block;
+    float: none;
+}
+
+/* Hide vertical scrollbar on doc tabs and add padding */
+#docsTab {
+    overflow-y: hidden;
+    padding-bottom: 1px; /* Prevent scrollbar from clipping bottom border */
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Specific styles for documentation tables */
+.capex-main-table,
+.capex-engineering-table,
+.capex-master-plan-table,
+.capex-premium-base-table {
+    table-layout: fixed;
+    width: 100%;
+    font-size: 0.85rem; /* Slightly smaller font for dense tables */
+}
+
+.capex-main-table td, .capex-main-table th,
+.capex-engineering-table td, .capex-engineering-table th,
+.capex-master-plan-table td, .capex-master-plan-table th,
+.capex-premium-base-table td, .capex-premium-base-table th {
+    vertical-align: top;
+    padding: 0.5rem;
+    word-wrap: break-word;
+}
+
+/* Column widths for "Предлагаемая программа" */
+.capex-main-table th:nth-child(1) { width: 5%; } /* # */
+.capex-main-table th:nth-child(2) { width: 30%; } /* Статья */
+.capex-main-table th:nth-child(3) { width: 10%; } /* Кол-во */
+.capex-main-table th:nth-child(4) { width: 12%; } /* Цена */
+.capex-main-table th:nth-child(5) { width: 12%; } /* Сумма */
+.capex-main-table th:nth-child(6) { width: 31%; } /* Источник */
+
+/* Column widths for "Как работает инженерка" */
+.capex-engineering-table th:nth-child(1) { width: 20%; } /* Система */
+.capex-engineering-table th:nth-child(2) { width: 45%; } /* Решение */
+.capex-engineering-table th:nth-child(3) { width: 20%; } /* Нагрузка */
+.capex-engineering-table th:nth-child(4) { width: 15%; } /* Объём */
+
+/* Column widths for "Мастер-план" */
+.capex-master-plan-table th:nth-child(1) { width: 15%; } /* Фаза */
+.capex-master-plan-table th:nth-child(2) { width: 35%; } /* Что строим */
+.capex-master-plan-table th:nth-child(3) { width: 10%; } /* CAPEX */
+.capex-master-plan-table th:nth-child(4) { width: 10%; } /* Юнитов */
+.capex-master-plan-table th:nth-child(5) { width: 30%; } /* События */
+
+/* Column widths for "Премиум-база" */
+.capex-premium-base-table th:nth-child(1) { width: 20%; } /* Узел */
+.capex-premium-base-table th:nth-child(2) { width: 55%; } /* Спецификация */
+.capex-premium-base-table th:nth-child(3) { width: 25%; } /* Цены */
+
+.capex-main-table .table-secondary td {
+    font-weight: bold;
+}
+
+#capex-docs-panel p.small, 
+#capex-docs-panel blockquote.small {
+    font-size: 0.8rem;
+    color: #6c757d;
+    font-style: italic;
 }

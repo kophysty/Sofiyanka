@@ -13,9 +13,9 @@
 </head>
 <body>
     <div class="container-fluid">
-        <div class="row">
+        <div class="resizable-container">
             <!-- Left Sidebar - Input Parameters -->
-            <div class="col-md-4 sidebar-gold">
+            <div id="sidebar-panel" class="sidebar-gold">
                 <div class="text-center my-3">
                     <img src="logo_sofyinka.png" alt="Sofyinka Logo" class="sofyinka-logo">
                 </div>
@@ -528,8 +528,10 @@
                 </div>
             </div>
 
+            <div class="resizer" id="drag-handle"></div>
+
             <!-- Main Content - Results -->
-            <div class="col-md-8">
+            <div id="main-content-panel">
                 <div class="sticky-kpi-bar">
                     <!-- KPI Cards -->
                     <div class="row mb-4">

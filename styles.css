@@ -524,3 +524,38 @@ tbody tr:hover {
     color: #6c757d;
     font-style: italic;
 }
+
+/* --- Resizable Panel Styles --- */
+.resizable-container {
+    display: flex;
+    height: 100vh;
+    overflow: hidden; /* Prevent container from overflowing */
+}
+
+#sidebar-panel {
+    flex: 0 0 33.33%; /* Initial width like col-4 */
+    min-width: 400px;  /* Prevent it from becoming too small */
+    max-width: 800px;  /* Prevent it from becoming too large */
+    overflow-y: auto;  /* Allow sidebar content to scroll */
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.resizer {
+    flex: 0 0 5px; /* Width of the resizer */
+    cursor: col-resize;
+    background-color: #d4e9e2;
+    transition: background-color 0.2s ease;
+    position: relative;
+    z-index: 10;
+}
+
+.resizer:hover {
+    background-color: #a8cbb7; /* Highlight on hover */
+}
+
+#main-content-panel {
+    flex: 1 1 66.67%; /* Takes up remaining space */
+    overflow-y: auto;  /* Allow main content to scroll */
+    padding: 20px 30px;
+}

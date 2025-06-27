@@ -935,32 +935,71 @@ function populateSeasonalitySliders() {
 }
 
 async function initializePage() {
-    // Enable tooltips
+    // Tooltips
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
+        return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    // Initial calculation and chart drawing
     populateExtraRevenues();
     populateSeasonalitySliders();
-    document.querySelectorAll('#house-list .house-row').forEach(row => initializeHouseRow(row as HTMLElement));
-    
-    // Load default values from the imported JSON
-    loadDefaultScenario();
-
-    // The rest of the setup relies on the UI being populated
-    updateTotalCapexUI();
-    updateTotalOpexUI();
     setupEventListeners();
-    updateScenarioDropdown(); // Populate scenarios on load
-
-    // Run calculation once on load
-    window.calculate();
+    loadDefaultScenario();
+    initializeResizer();
 }
 
-// Ensure bootstrap tooltips are initialized
-document.addEventListener('DOMContentLoaded', () => {
-    // The initializePage function is now async, but we can call it directly.
-    initializePage();
-}); 
+/**
+ * Sets up the draggable resizer between the sidebar and main content.
+ */
+function initializeResizer() {
+    const resizer = document.getElementById('drag-handle') as HTMLElement;
+    const sidebar = document.getElementById('sidebar-panel') as HTMLElement;
+    const mainContent = document.getElementById('main-content-panel') as HTMLElement;
+
+    let isResizing = false;
+    let startX: number;
+    let startWidth: number;
+
+    resizer.addEventListener('mousedown', (e: MouseEvent) => {
+        isResizing = true;
+        startX = e.clientX;
+        startWidth = sidebar.offsetWidth;
+        
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!isResizing) return;
+            const dx = e.clientX - startX;
+            const newWidth = startWidth + dx;
+
+            // Enforce min/max width constraints defined in CSS
+            const minWidth = parseInt(window.getComputedStyle(sidebar).minWidth, 10);
+            const maxWidth = parseInt(window.getComputedStyle(sidebar).maxWidth, 10);
+
+            if (newWidth >= minWidth && newWidth <= maxWidth) {
+                sidebar.style.flexBasis = `${newWidth}px`;
+            }
+        };
+
+        const handleMouseUp = () => {
+            isResizing = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+            
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+
+            // This is a good place to trigger a chart redraw if its container was resized
+            if (cashFlowChart) {
+                cashFlowChart.resize();
+            }
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    });
+}
+
+// --- Initial Page Load ---
+document.addEventListener('DOMContentLoaded', initializePage); 

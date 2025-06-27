@@ -92,11 +92,16 @@
                                             <input type="number" class="form-control" id="other" value="0.5" step="0.1">
                                         </div>
                                         <div class="form-group mb-3">
-                                            <label class="form-label">Reserve (10%)</label>
-                                            <input type="number" class="form-control" id="reserve" value="4.65" step="0.01" readonly>
+                                            <label class="form-label">Резерв</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="reserve-percentage" value="10" step="1" min="0" max="100">
+                                                <span class="input-group-text">%</span>
+                                                <input type="number" class="form-control" id="reserve-amount" step="0.01" readonly>
+                                                <span class="input-group-text">млн ₽</span>
+                                            </div>
                                         </div>
                                         <div class="form-group mb-3">
-                                            <label class="form-label">Total CAPEX</label>
+                                            <label class="form-label">Total CAPEX (включая резерв)</label>
                                             <input type="number" class="form-control fw-bold" id="total-capex" value="51.1" step="0.1" readonly>
                                         </div>
                                     </div>
@@ -222,15 +227,27 @@
                                 <div class="tab-content pt-3">
                                     <div class="tab-pane fade show active" id="concepts-panel" role="tabpanel" aria-labelledby="concepts-tab">
                                         <div class="documentation-section">
-                                            <h4>Как читать таблицу и график</h4>
+                                            <h4>Основные понятия</h4>
+                                            <p>Этот раздел поможет вам понять ключевые термины и логику, заложенную в финансовую модель.</p>
+                                            
+                                            <h5>Финансовые термины:</h5>
                                             <ul>
-                                                <li><strong>Revenue</strong> — прогноз выручки за каждое полугодие;</li>
-                                                <li><strong>FOT</strong> — фонд оплаты труда (≈ 25 % выручки, включает housekeeping, ресепшн, техперсонал, кухню/завтраки);</li>
-                                                <li><strong>Other OPEX</strong> — коммуналка, расходные материалы, маркетинг (ещё ≈ 25 %);</li>
-                                                <li><strong>CAPEX</strong> — фактические платежи за стройку и оборудование (вся инвестиционная программа 51 млн ₽ распределена по фазам);</li>
-                                                <li><strong>Net Cashflow</strong> — чистый денежный поток периода;</li>
-                                                <li><strong>Cumulative Cashflow</strong> — накопленный поток (показан также линией на графике).</li>
+                                                <li><strong>Revenue (Выручка)</strong> — Общий доход от сдачи домиков в аренду и дополнительных услуг.</li>
+                                                <li><strong>CAPEX (Capital Expenditures / Капитальные затраты)</strong> — Единовременные инвестиции в строительство и оснащение проекта (покупка земли, строительство домиков, инфраструктура).</li>
+                                                <li><strong>OPEX (Operational Expenditures / Операционные затраты)</strong> — Ежегодные расходы на поддержание работы проекта (зарплаты, маркетинг, коммунальные услуги, налоги).</li>
+                                                <li><strong>Cash Flow (Денежный поток)</strong> — Разница между поступлениями (выручка) и выбытиями (OPEX, CAPEX, налоги) денег за период.</li>
+                                                <li><strong>Payback Period (Срок окупаемости)</strong> — Период времени, за который накопленный денежный поток становится положительным.</li>
                                             </ul>
+
+                                            <h5>Ключевые параметры модели:</h5>
+                                            <ul>
+                                                <li><p><strong>Occupancy Rate (%) / Базовая загрузка</strong>: Это среднегодовая загрузка всех домиков без учета сезонных колебаний. Выступает как основа для дальнейших расчетов.</p></li>
+                                                <li><p><strong>ADR (Average Daily Rate) / Средняя цена за ночь</strong>: Средняя стоимость аренды одного домика в сутки. Является базой для расчета выручки.</p></li>
+                                                <li><p><strong>Коэффициенты сезонности (от 0.5 до 2.5)</strong>: Позволяют смоделировать колебания спроса в течение года. Например, коэффициент 1.2 для июля означает, что загрузка будет на 20% выше базовой, а 0.8 для ноября — на 20% ниже.</p></li>
+                                            </ul>
+                                            <p class="mt-3"><strong>Как это работает вместе:</strong> Итоговая загрузка для каждого месяца рассчитывается путем умножения базовой <code>Occupancy Rate</code> на коэффициент этого месяца. Например, если базовая загрузка 60%, а коэффициент для июля — 1.5, то расчетная загрузка на июль составит 90% (60% * 1.5).</p>
+                                            <p class="small text-muted fst-italic">Это удобно, потому что для изменения общего прогноза достаточно поменять только один базовый параметр (среднюю загрузку), сохранив при этом сезонный "рисунок" спроса.</p>
+                                            <p class="alert alert-info small mt-3"><strong>Важно:</strong> Итоговая загрузка для любого месяца автоматически ограничивается 100%. Например, если базовая загрузка 80%, а коэффициент для месяца — 1.5, то расчетная загрузка составит 120%, но модель автоматически ограничит ее до 100%.</p>
                                         </div>
                                     </div>
                                     <div class="tab-pane fade" id="docs-costs-panel" role="tabpanel" aria-labelledby="docs-costs-tab">

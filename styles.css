@@ -526,6 +526,11 @@ tbody tr:hover {
     font-style: italic;
 }
 
+#scenario-manager-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
 /* --- Resizable Panel Styles --- */
 .resizable-container {
     display: flex;

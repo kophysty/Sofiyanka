@@ -220,11 +220,12 @@ function updateTotalCapexUI() {
                        getInputNumber('landscaping', 0) + getInputNumber('furniture', 0) +
                        getInputNumber('other', 0);
 
-    const totalCapex = houseCapex + otherCapex;
-    const reserve = totalCapex * 0.1;
-    const totalInvestment = totalCapex + reserve;
+    const subtotalCapex = houseCapex + otherCapex;
+    const reservePercentage = getInputNumber('reserve-percentage', 10) / 100;
+    const reserveAmount = subtotalCapex * reservePercentage;
+    const totalInvestment = subtotalCapex + reserveAmount;
 
-    (document.getElementById('reserve') as HTMLInputElement).value = reserve.toFixed(2);
+    (document.getElementById('reserve-amount') as HTMLInputElement).value = reserveAmount.toFixed(2);
     (document.getElementById('total-capex') as HTMLInputElement).value = totalInvestment.toFixed(2);
     (document.getElementById('total-investment') as HTMLElement).textContent = totalInvestment.toFixed(1);
 }
@@ -416,12 +417,15 @@ window.calculate = function calculate() {
   const houseCapex = phase1.getTotalCapex(HOUSE_TYPES);
   const otherCapex = params.publicBuildings + params.sportSpa + params.engineering + 
                      params.itSmart + params.landscaping + params.furniture + params.other;
-  const totalCapex = houseCapex + otherCapex;
+  const subtotalCapex = houseCapex + otherCapex;
 
   // 4. Update reserve and total CAPEX fields
-  const reserve = totalCapex * 0.1;
-  (document.getElementById('reserve') as HTMLInputElement).value = reserve.toFixed(2);
-  (document.getElementById('total-capex') as HTMLInputElement).value = totalCapex.toFixed(2);
+  const reservePercentage = getInputNumber('reserve-percentage', 10) / 100;
+  const reserveAmount = subtotalCapex * reservePercentage;
+  const totalInvestment = subtotalCapex + reserveAmount;
+
+  (document.getElementById('reserve-amount') as HTMLInputElement).value = reserveAmount.toFixed(2);
+  (document.getElementById('total-capex') as HTMLInputElement).value = totalInvestment.toFixed(2);
 
   // 5. Create Scenario
   const scenario = new Scenario('ui', 'UI Scenario', {
@@ -439,10 +443,9 @@ window.calculate = function calculate() {
   phase1.houses.forEach(h => scenario.addHouse(h));
 
   // 6. Расчёт
-  const timeline = CalculationService.buildPhaseTimeline(scenario, totalCapex);
+  const timeline = CalculationService.buildPhaseTimeline(scenario, subtotalCapex);
   const cashFlow = CalculationService.calculateCashFlow(scenario, timeline);
   
-  const totalInvestment = totalCapex * 1.1; // Add 10% reserve
   const kpis = CalculationService.deriveKPIs(cashFlow, totalInvestment);
 
   // 7. Обновить KPI в DOM
@@ -686,9 +689,12 @@ function setupEventListeners() {
     });
 
     // Inputs that only update the CAPEX display without a full recalculation
-    const capexInputs = ['public-buildings', 'sport-spa', 'engineering', 'it-smart', 'landscaping', 'furniture', 'other'];
+    const capexInputs = ['public-buildings', 'sport-spa', 'engineering', 'it-smart', 'landscaping', 'furniture', 'other', 'reserve-percentage'];
     capexInputs.forEach(id => {
-        document.getElementById(id)?.addEventListener('input', updateTotalCapexUI);
+        document.getElementById(id)?.addEventListener('input', () => {
+            updateTotalCapexUI();
+            window.calculate(); // Also trigger full recalc
+        });
     });
 
     // Inputs that only update the OPEX display without a full recalculation

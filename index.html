@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -16,12 +16,12 @@
         <div class="resizable-container">
             <!-- Left Sidebar - Input Parameters -->
             <div id="sidebar-panel" class="sidebar-gold">
-                <div class="text-center my-3">
+                <div class="text-center my-2">
                     <img src="logo_sofyinka.png" alt="Sofyinka Logo" class="sofyinka-logo">
                 </div>
-                <header class="my-4">
-                    <h1 class="text-center">SOFYINKA LA CAMP</h1>
-                    <p class="text-muted text-center">Версия 1.3 | Обновлено: Июнь 2025</p>
+                <header class="my-3">
+                    <h1 class="text-center">Финмодель проекта</h1>
+                    <p class="text-muted text-center">Версия 1.4 | Обновлено: Июль 2025</p>
                 </header>
 
                 <!-- Top-level Nav tabs -->
@@ -276,6 +276,7 @@
                                             </table>
                                         </div>
                                         <p class="small text-muted text-end mt-1">Цены — июнь 2025 г., Подмосковье/Калужская обл.; диапазон показывает spread у 3–4 крупнейших модульных заводов.</p>
+
                                         <h4 class="mt-4">Что входит в комплектацию</h4>
                                         <div class="table-responsive">
                                             <table class="table table-bordered">
@@ -301,6 +302,31 @@
                                                 </tbody>
                                             </table>
                                         </div>
+
+                                        <h4 class="mt-4">Что именно входит в «премиум-базу» (каждый юнит)</h4>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered capex-premium-base-table">
+                                                <thead class="table-light"><tr><th>Узел</th><th>Спецификация</th><th>Ориентир цены</th></tr></thead>
+                                                <tbody>
+                                                    <tr><td><strong>Фундамент</strong></td><td>свайно-ростверк (SIP/A-Frame) или «умная плита» (1-дом)</td><td>180–220 тыс ₽</td></tr>
+                                                    <tr><td><strong>Отопление</strong></td><td>водяной тёплый пол, 1 контур, электрокотёл 6 кВт</td><td>140–180 тыс ₽</td></tr>
+                                                    <tr><td><strong>Веранда</strong></td><td>10 м² террасная доска, каркас из ЛВЛ</td><td>80 тыс ₽</td></tr>
+                                                    <tr><td><strong>Мини-кухня-бар</strong></td><td>стойка 1,8 м, индукция 2 конф., мойка, 90-л холодильник</td><td>120 тыс ₽</td></tr>
+                                                    <tr><td><strong>Санузел</strong></td><td>душ 90×90, инсталляция, бойлер 50 л</td><td>95 тыс ₽</td></tr>
+                                                    <tr><td><strong>Smart-пакет</strong></td><td>замок ZigBee, датчики t°/влажн., сценарный свет</td><td>40 тыс ₽</td></tr>
+                                                    <tr><td><strong>Газон + хвойники</strong></td><td>60–70 м² рулон, 3 сосны 2 м, мульча</td><td>40 тыс ₽</td></tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <p class="small text-muted mt-1">Общая «надбавка» за премиум-базу ≈ <strong>0,4–0,5 млн ₽</strong> к варианту «комфорт-под-ключ».</p>
+                                        <hr>
+
+                                        <h4 class="mt-4">Как выбирать уровень</h4>
+                                        <ul>
+                                            <li><strong>Эконом</strong>: подойдёт только для staff-дома или very-budget тента; для гостевого фонда не берём — нет вау-эффекта.</li>
+                                            <li><strong>Комфорт</strong>: базовый рынок; можно оставить 1-2 домика на случай «антикризисных» пакетов.</li>
+                                            <li><strong>Премиум-база</strong>: основа концепции Софьинки — именно её закладываем в финансовой модели, чтобы держать ADR ⩾ 6 500–9 000 ₽.</li>
+                                        </ul>
                                     </div>
                                     <div class="tab-pane fade" id="placement-panel" role="tabpanel" aria-labelledby="placement-tab">
                                         <h4>Ключевые принципы размещения</h4>
@@ -497,29 +523,6 @@
                                         </div>
                                         <blockquote class="blockquote small mt-2">Бесшумная стройка для гостей. Основные траншеи и подводы прокладываются в Фазе I → дальше техника ездит по внешнему кольцу (арендный участок), а внутри курорт живёт обычным режимом.</blockquote>
                                         <hr>
-                                        <h4>Что именно входит в «премиум-базу» (каждый юнит)</h4>
-                                        <div class="table-responsive">
-                                            <table class="table table-sm table-bordered capex-premium-base-table">
-                                                <thead class="table-light"><tr><th>Узел</th><th>Спецификация</th><th>Ориентир цены</th></tr></thead>
-                                                <tbody>
-                                                    <tr><td><strong>Фундамент</strong></td><td>свайно-ростверк (SIP/A-Frame) или «умная плита» (1-дом)</td><td>180–220 тыс ₽</td></tr>
-                                                    <tr><td><strong>Отопление</strong></td><td>водяной тёплый пол, 1 контур, электрокотёл 6 кВт</td><td>140–180 тыс ₽</td></tr>
-                                                    <tr><td><strong>Веранда</strong></td><td>10 м² террасная доска, каркас из ЛВЛ</td><td>80 тыс ₽</td></tr>
-                                                    <tr><td><strong>Мини-кухня-бар</strong></td><td>стойка 1,8 м, индукция 2 конф., мойка, 90-л холодильник</td><td>120 тыс ₽</td></tr>
-                                                    <tr><td><strong>Санузел</strong></td><td>душ 90×90, инсталляция, бойлер 50 л</td><td>95 тыс ₽</td></tr>
-                                                    <tr><td><strong>Smart-пакет</strong></td><td>замок ZigBee, датчики t°/влажн., сценарный свет</td><td>40 тыс ₽</td></tr>
-                                                    <tr><td><strong>Газон + хвойники</strong></td><td>60–70 м² рулон, 3 сосны 2 м, мульча</td><td>40 тыс ₽</td></tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        <p class="small text-muted mt-1">Общая «надбавка» за премиум-базу ≈ <strong>0,4–0,5 млн ₽</strong> к варианту «комфорт-под-ключ».</p>
-                                        <hr>
-                                        <h4>Как выбирать уровень</h4>
-                                        <ul>
-                                            <li><strong>Эконом</strong>: подойдёт только для staff-дома или very-budget тента; для гостевого фонда не берём — нет вау-эффекта.</li>
-                                            <li><strong>Комфорт</strong>: базовый рынок; можно оставить 1-2 домика на случай «антикризисных» пакетов.</li>
-                                            <li><strong>Премиум-база</strong>: основа концепции Софьинки — именно её закладываем в финансовой модели, чтобы держать ADR ⩾ 6 500–9 000 ₽.</li>
-                                        </ul>
                                     </div>
                                 </div>
                             </div>

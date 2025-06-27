@@ -8,17 +8,18 @@ body {
 
 /* Header Styling */
 header {
-    padding: 1.5rem 0;
+    padding: 0.5rem 0;
     border-bottom: 1px solid #e9ecef;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 header h1 {
     color: #2c3e50;
-    font-weight: 700;
-    font-family: 'Playfair Display', serif;
-    letter-spacing: 2px;
-    font-size: 2.2rem;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.5px;
+    font-size: 1.7rem;
+    margin: 0;
 }
 
 /* Chart Styling */
@@ -370,7 +371,7 @@ tbody tr:hover {
 }
 
 .sofyinka-logo {
-    width: 150px;
+    width: 120px;
     height: auto;
     filter: none !important;
     box-shadow: none;

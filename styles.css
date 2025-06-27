@@ -562,3 +562,46 @@ tbody tr:hover {
     overflow-y: auto;  /* Allow main content to scroll */
     padding: 20px 30px 0 30px;
 }
+
+/* Custom styling for range sliders */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #d4e9e2;
+    border-radius: 5px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+}
+
+input[type="range"]:hover {
+    opacity: 1;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #2e4637;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #2e4637;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+#seasonality-settings .row {
+    margin-bottom: 0.5rem; /* Reduce vertical spacing */
+}
+
+#seasonality-settings .col-md-6 {
+    padding-bottom: 0;
+}

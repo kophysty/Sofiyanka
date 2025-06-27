@@ -222,8 +222,9 @@ tbody tr:hover {
     border-radius: 0.5rem;
     border: 1px solid #dee2e6;
     margin-bottom: 1.5rem;
-    max-height: 70vh;
-    overflow-y: auto;
+    max-height: none;
+    overflow-y: visible;
+    overflow-x: auto;
 }
 
 /* Scrollbar styling */
@@ -371,15 +372,14 @@ tbody tr:hover {
 }
 
 .sofyinka-logo {
-    width: 120px;
+    width: 150px;
     height: auto;
     filter: none !important;
     box-shadow: none;
     background: none !important;
     border-radius: 8px;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 5px auto;
 }
 
 .col-md-8 {
@@ -396,9 +396,8 @@ tbody tr:hover {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background-color: #f8f9fa; /* Or your desired background color */
+    background-color: transparent; /* Or your desired background color */
     padding: 1rem 0;
-    margin-bottom: 1rem;
 }
 
 /* Make top-level tabs more prominent */
@@ -535,16 +534,14 @@ tbody tr:hover {
 .resizable-container {
     display: flex;
     height: 100vh;
-    overflow: hidden; /* Prevent container from overflowing */
 }
 
 #sidebar-panel {
-    flex: 0 0 33.33%; /* Initial width like col-4 */
-    min-width: 400px;  /* Prevent it from becoming too small */
-    max-width: 800px;  /* Prevent it from becoming too large */
-    overflow-y: auto;  /* Allow sidebar content to scroll */
-    padding-right: 15px;
-    padding-left: 15px;
+    flex-basis: 40%; /* Initial width */
+    min-width: 350px;  /* Minimum width it can be resized to */
+    max-width: 900px; /* Maximum width it can be resized to */
+    overflow-y: auto;
+    padding-right: 15px; /* Add some padding so content isn't flush with resizer */
 }
 
 .resizer {
@@ -561,7 +558,7 @@ tbody tr:hover {
 }
 
 #main-content-panel {
-    flex: 1 1 66.67%; /* Takes up remaining space */
+    flex-grow: 1; /* Take remaining space */
     overflow-y: auto;  /* Allow main content to scroll */
-    padding: 20px 30px;
+    padding: 20px 30px 0 30px;
 }

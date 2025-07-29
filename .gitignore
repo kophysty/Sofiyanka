@@ -247,3 +247,8 @@ venv.bak/
 .mypy_cache/
 .dmypy.json
 dmypy.json 
+
+# Archive files
+*.rar
+*.zip
+*.7z 
